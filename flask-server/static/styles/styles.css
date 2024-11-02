@@ -148,17 +148,38 @@ header {
 header h1 {
     position: relative;
     display: inline-block;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+header h1:hover {
+    transform: scale(1.05);
+}
+
+header h1::after {
+    content: "Chef's Fantastic And Ready To Serve";
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: max-content;
+    padding: 0.2rem 0.4rem;
+    font-size: 0.9rem;
+    color: #ffe4b5;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 4px;
+    transform: translateX(-50%) scale(0.9);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+    white-space: nowrap;
+    margin-top: 0.5rem;
 }
 
 header h1:hover::after {
-    content: " - Fantastic And Ready To Serve";
-    color: #ffe4b5;
-    font-size: 0.9rem;
-    font-weight: normal;
-    position: absolute;
-    left: 100%;
-    margin-left: 0.5rem;
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
 }
+
 
 /* Loading Spinner */
 .loading-spinner {
