@@ -1,34 +1,47 @@
+from langchain_ollama import OllamaLLM
+
+
 #goal create AI prompt for recipe given prompt
-def response():
-    return None
+def response_recipe(ingredients: list[str], cost: int = "all", cuisine: str = "all", serving_size: int = "all",
+                    meal_type: str = "all", allergies: str = "None"):
+    model = OllamaLLM(model="llama3.2:3b")
+    ingredient_prompt = ""
+    for i in range(len(ingredients)):
+        ingredient_prompt += ingredients[i]
+        ingredient_prompt += " "
+    prompt = "Create three recipe with " + ingredient_prompt + "with "
+    if cost == "all":
+        prompt += "all cost range "
+    else:
+        prompt += str(cost)
+        prompt += " dollars, "
+    prompt += "of "
+    if cuisine == all:
+        prompt += "all types of cuisine "
+    else:
+        prompt += (cuisine + " cuisine, ")
+    prompt += "of "
+    if serving_size == "all":
+        prompt += "all serving sizes, "
+    else:
+        prompt += str(serving_size)
+        prompt += " serving size, "
+    prompt += "that is for "
+    if meal_type == "all":
+        prompt += "either breakfast, lunch or dinner, "
+    else:
+        prompt += (meal_type + ", ")
+    prompt += "avoid "
+    if allergies == "None":
+        prompt += "no allergies."
+    else:
+        prompt += allergies
+    print(prompt)  #test
 
+    result = model.invoke(prompt)
+    print(result)
 
-#ignore these codes, here for reference for Kai to learn how to use ollama
-import ollama
-default_model = ollama.list()['models'][0]['name']
+    #code goes here
+    return result
 
-class Agent:
-    def __init__(self, name: str, description: str, model=default_model):
-        self.name = name
-        self.description = description
-        self.model = model
-        self.history = [{'role': 'system', 'content': f"You are {name}, {description}."}]
-
-    def add_message(self, message: str, role='assistant'):
-        self.history.append({'role': role, 'content': message})
-
-    def response(self, message: str):
-        self.history.append({'role': 'user', 'content': message})
-        response = ollama.chat(
-            model=self.model,
-            messages=self.history
-        )
-        self.history.append({'role': 'assistant', 'content': response['message']['content']})
-        return response
-
-    def get_output(self, message: str):
-        response = ollama.chat(
-            model=self.model,
-            messages=self.history + [{'role': 'user', 'content': message}]
-        )
-        return response
+response_recipe(["chicken", "corn", "fish", "corn flakes"], 30, "American")
