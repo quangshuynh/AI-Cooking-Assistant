@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chef's F.A.R.T.S.</title>
+    <link rel="stylesheet" href="../static/styles/styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>AI Recipe Generator</h1>
+        <p>Get unique recipes based on the ingredients you have!</p>
+    </header>
+
+    <main>
+        <!-- Ingredient Selection Section -->
+        <div class="section" id="ingredients-section">
+            <h2>Select Your Ingredients</h2>
+            <div class="ingredients-list" id="ingredients-list">
+                <div class="ingredient-item">Tomato</div>
+                <div class="ingredient-item">Chicken</div>
+                <div class="ingredient-item">Rice</div>
+                <div class="ingredient-item">Cheese</div>
+                <div class="ingredient-item">Lettuce</div>
+                <div class="ingredient-item">Garlic</div>
+                <div class="ingredient-item">Onion</div>
+                <!-- Add more ingredients as needed -->
+            </div>
+            <button onclick="generateRecipe()">Generate Recipe</button>
+        </div>
+
+        <!-- Generated Recipe Display Section -->
+        <div class="section" id="recipe-section">
+            <h2>Your Recipe</h2>
+            <div class="recipe-display" id="recipe-display">
+                <p>Select ingredients and click "Generate Recipe" to get started!</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Select ingredient elements
+        const ingredients = document.querySelectorAll('.ingredient-item');
+        
+        ingredients.forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('selected');
+            });
+        });
+
+        function generateRecipe() {
+            const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
+                .map(item => item.textContent);
+
+            // Simulate recipe generation (this should be replaced with actual AI logic)
+            const recipeDisplay = document.getElementById('recipe-display');
+            if (selectedIngredients.length > 0) {
+                recipeDisplay.innerHTML = `
+                    <h3>Generated Recipe</h3>
+                    <p>Ingredients: ${selectedIngredients.join(', ')}</p>
+                    <p>Instructions: Combine the selected ingredients with your favorite spices and cook until perfect! Enjoy your unique dish!</p>
+                `;
+            } else {
+                recipeDisplay.innerHTML = `<p>Please select at least one ingredient to generate a recipe.</p>`;
+            }
+        }
+    </script>
+
+</body>
+</html>
