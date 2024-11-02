@@ -1,136 +1,131 @@
+/* General Styles */
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
     background-color: #f8f8f8;
+    color: #333;
 }
 
 header {
     background-color: #ff6347;
     color: white;
-    padding: 1rem;
+    padding: 1.2rem;
     text-align: center;
+    font-size: 1.2rem;
 }
 
 main {
-    padding: 2rem;
+    padding: 1.5rem;
     max-width: 800px;
     margin: auto;
 }
 
 .section {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
-.section h2 {
-    color: #ff6347;
-}
-
+/* Ingredient Search */
 .search-box {
     width: 100%;
-    padding: 0.75rem;
-    font-size: 1rem;
-    margin-bottom: 1rem;
+    padding: 0.6rem;
+    font-size: 0.95rem;
     border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
 }
 
-.category-button {
+.results-list, .selected-ingredients-list {
+    list-style: none;
+    padding: 0;
+}
+
+.results-list li, .selected-ingredients-list li {
+    padding: 0.4rem;
+    margin: 0.4rem 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.3s;
+}
+
+.results-list li:hover {
+    background-color: #f0f0f0;
+}
+
+/* Highlight selected ingredients */
+.selected-ingredients-list li.selected {
     background-color: #ff6347;
     color: white;
-    border: none;
-    padding: 0.75rem;
-    text-align: left;
-    width: 100%;
-    font-size: 1.1rem;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-bottom: 0.5rem;
-    transition: background-color 0.3s;
 }
 
-.category-button:hover {
-    background-color: #e5533e;
+/* Preferences Section */
+.preferences-section {
+    margin-top: 1.5rem;
 }
 
-.ingredients-list {
-    display: none;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1rem;
+.preferences-section h2 {
+    color: #ff6347;
+    font-size: 1.2rem;
+}
+
+/* Preferences Card */
+.preferences-card {
+    display: flex;
+    flex-direction: column;
     background-color: #fff;
     border: 1px solid #ddd;
+    padding: 0.8rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0.8rem;
+}
+
+.preferences-card label {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+}
+
+.preferences-card input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
     border-radius: 5px;
-    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
 }
 
-.ingredient-item {
-    background-color: #fff;
-    padding: 0.5rem 1rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+.preferences-card input:focus {
+    border-color: #ff6347;
+    outline: none;
+    box-shadow: 0 0 3px rgba(255, 99, 71, 0.3);
 }
 
-.ingredient-item.selected {
-    background-color: #ff6347;
-    color: #fff;
-}
-
+/* Generate Button */
 button.generate-btn {
-    padding: 0.5rem 1rem;
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
     background-color: #ff6347;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.95rem;
+    font-weight: bold;
+    transition: background-color 0.3s;
 }
 
 button.generate-btn:hover {
     background-color: #e5533e;
 }
 
+/* Recipe Display */
 .recipe-display {
     background-color: #fff;
-    padding: 1rem;
-    border-radius: 5px;
+    padding: 0.8rem;
+    border-radius: 8px;
     border: 1px solid #ddd;
-}
-
-button.generate-btn {  
-    padding: 0.5rem 1rem;
-    background-color: #ff6347;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
     font-size: 1rem;
-    margin-top: 0.5rem;
-}
-
-button.generate-btn:hover {
-    background-color: #e5533e;
-}
-
-.ingredient-item {
-    background-color: #fff;
-    padding: 0.5rem 1rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.ingredient-item.selected {
-    background-color: #ff6347;
-    color: #fff;
-}
-
-.ingredient-item.disabled {
-    background-color: #f0f0f0;
-    color: #aaa;
-    cursor: not-allowed;
-    border: 1px solid #ddd;
+    line-height: 1.4;
 }

@@ -1,94 +1,60 @@
-// toggle the display of each ingredient list
-function toggleCategory(categoryId, show = null) {
-    const categoryList = document.getElementById(categoryId);
-    if(show === true) {
-        categoryList.style.display = 'flex';
-    } else if(show === false) {
-        categoryList.style.display = 'none';
+async function searchIngredients() {
+    const query = document.getElementById('ingredient-search').value;
+    const response = await fetch(`/api/ingredients?query=${query}`);
+    const ingredients = await response.json();
+
+    const resultsList = document.getElementById('search-results');
+    resultsList.innerHTML = '';
+
+    ingredients.forEach(ingredient => {
+        const li = document.createElement('li');
+        li.textContent = ingredient.description;
+        li.onclick = () => selectIngredient(ingredient.description);
+        resultsList.appendChild(li);
+    });
+}
+
+function selectIngredient(ingredient) {
+    const selectedList = document.getElementById('selected-ingredients');
+    const existingIngredient = Array.from(selectedList.children).find(
+        child => child.textContent === ingredient
+    );
+
+    if (existingIngredient) {
+        // If ingredient is already selected, unselect it
+        existingIngredient.remove();
     } else {
-        categoryList.style.display = categoryList.style.display === 'flex' ? 'none' : 'flex';
+        // If ingredient is not selected, add it to the selected list and highlight it
+        const li = document.createElement('li');
+        li.textContent = ingredient;
+        li.classList.add('selected');  // Add selected class for highlighting
+        li.onclick = () => li.remove();  // Remove ingredient on click
+        selectedList.appendChild(li);
     }
 }
 
-// filter ingredients based on search input and allergies
-function filterIngredients() {
-    const searchValue = document.getElementById('ingredient-search').value.toLowerCase();
-    const ingredients = document.querySelectorAll('.ingredient-item');
+async function generateRecipe() {
+    const ingredients = Array.from(document.getElementById('selected-ingredients').children).map(li => li.textContent);
+    const allergies = document.getElementById('allergies').value;
+    const maxCost = document.getElementById('max-cost').value;
+    const cuisine = document.getElementById('cuisine').value;
+    const servingSize = document.getElementById('serving-size').value;
+    const mealType = document.getElementById('meal-type').value;
 
-    // get selected allergens
-    const selectedAllergies = Array.from(document.querySelectorAll('.allergy-checkbox:checked'))
-        .map(checkbox => checkbox.value);
-
-    // track categories with matches
-    const categories = {
-        "protein-list": false,
-        "dairy-list": false,
-        "fruits-list": false,
-        "veggies-list": false
-    };
-
-    ingredients.forEach(item => {
-        const ingredientText = item.textContent.toLowerCase();
-        const category = item.parentElement.id;
-        const allergens = item.getAttribute('data-allergens') || '';
-
-        // check if ingredient should be disabled due to allergies
-        const isAllergen = selectedAllergies.some(allergy => allergens.includes(allergy));
-        const matchesSearch = ingredientText.includes(searchValue);
-
-        // if it's an allergen, gray it out and disable selection
-        if(isAllergen) {
-            item.classList.add('disabled');
-            item.classList.remove('selected'); // deselect if already selected
-        } else {
-            item.classList.remove('disabled');
-        }
-
-        // Show ingredient if it matches the search and is not hidden by allergy
-        item.style.display = matchesSearch ? 'block' : 'none';
-        if(matchesSearch && !isAllergen) {
-            categories[category] = true; // Show category if there's a matching ingredient
-        }
-    });
-
-    // show or hide categories based on matches
-    Object.keys(categories).forEach(categoryId => {
-        toggleCategory(categoryId, categories[categoryId]);
-    });
-}
-
-// select ingredient elements
-const ingredients = document.querySelectorAll('.ingredient-item');
-
-ingredients.forEach(item => {
-    item.addEventListener('click', () => {
-        // only toggle selection if item is not disabled
-        if(!item.classList.contains('disabled')) {
-            item.classList.toggle('selected');
-        }
-    });
-});
-
-// unselect all ingredients
-function unselectAllIngredients() {
-    ingredients.forEach(item => {
-        item.classList.remove('selected');
-    });
-}
-
-// generate a placeholder recipe based on selected ingredients
-function generateRecipe() {
-    const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
-        .map(item => item.textContent);
-
+    const response = await fetch(`/api/recipes?` +
+        `ingredients=${ingredients.join(',')}&allergies=${allergies}` +
+        `&max_cost=${maxCost}&cuisine=${cuisine}&serving_size=${servingSize}&meal_type=${mealType}`);
+    
+    const recipes = await response.json();
     const recipeDisplay = document.getElementById('recipe-display');
-    if(selectedIngredients.length > 0) {
-        recipeDisplay.innerHTML = `
-            <h3>Generated Recipe</h3>
-            <p>Ingredients: ${selectedIngredients.join(', ')}</p>
-            <p>Instructions: Combine the selected ingredients with your favorite spices and cook until perfect! Enjoy your unique dish!</p>
-        `;
+
+    if (recipes.length) {
+        recipeDisplay.innerHTML = recipes.map(recipe => `
+            <h3>${recipe.description}</h3>
+            <p>Category: ${recipe.food_category_id}</p>
+            <p>Published: ${recipe.publication_date}</p>
+        `).join('');
     } else {
-        recipeDisplay.innerHTML = `<p>Please select at least one ingredient to generate a recipe.</p>`;
+        recipeDisplay.innerHTML = `<p>No recipes found. Try adjusting your preferences.</p>`;
     }
 }
