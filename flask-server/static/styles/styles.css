@@ -26,10 +26,33 @@ main {
     color: #ff6347;
 }
 
+.category-button {
+    background-color: #ff6347;
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    text-align: left;
+    width: 100%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
+    transition: background-color 0.3s;
+}
+
+.category-button:hover {
+    background-color: #e5533e;
+}
+
 .ingredients-list {
-    display: flex;
+    display: none;
     flex-wrap: wrap;
     gap: 1rem;
+    padding: 1rem;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 1rem;
 }
 
 .ingredient-item {
@@ -46,7 +69,7 @@ main {
     color: #fff;
 }
 
-button {
+button.generate-btn {
     padding: 0.5rem 1rem;
     background-color: #ff6347;
     color: white;
@@ -56,7 +79,7 @@ button {
     font-size: 1rem;
 }
 
-button:hover {
+button.generate-btn:hover {
     background-color: #e5533e;
 }
 

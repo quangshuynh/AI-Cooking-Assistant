@@ -17,17 +17,48 @@
         <!-- Ingredient Selection Section -->
         <div class="section" id="ingredients-section">
             <h2>Select Your Ingredients</h2>
-            <div class="ingredients-list" id="ingredients-list">
-                <div class="ingredient-item">Tomato</div>
+
+            <!-- Protein Category -->
+            <button class="category-button" onclick="toggleCategory('protein-list')">Protein</button>
+            <div class="ingredients-list" id="protein-list">
                 <div class="ingredient-item">Chicken</div>
-                <div class="ingredient-item">Rice</div>
-                <div class="ingredient-item">Cheese</div>
-                <div class="ingredient-item">Lettuce</div>
-                <div class="ingredient-item">Garlic</div>
-                <div class="ingredient-item">Onion</div>
-                <!-- Add more ingredients as needed -->
+                <div class="ingredient-item">Beef</div>
+                <div class="ingredient-item">Tofu</div>
+                <div class="ingredient-item">Eggs</div>
+                <!-- Add more protein options as needed -->
             </div>
-            <button onclick="generateRecipe()">Generate Recipe</button>
+
+            <!-- Dairy Category -->
+            <button class="category-button" onclick="toggleCategory('dairy-list')">Dairy</button>
+            <div class="ingredients-list" id="dairy-list">
+                <div class="ingredient-item">Milk</div>
+                <div class="ingredient-item">Cheese</div>
+                <div class="ingredient-item">Yogurt</div>
+                <div class="ingredient-item">Butter</div>
+                <!-- Add more dairy options as needed -->
+            </div>
+
+            <!-- Fruits Category -->
+            <button class="category-button" onclick="toggleCategory('fruits-list')">Fruits</button>
+            <div class="ingredients-list" id="fruits-list">
+                <div class="ingredient-item">Apple</div>
+                <div class="ingredient-item">Banana</div>
+                <div class="ingredient-item">Strawberry</div>
+                <div class="ingredient-item">Orange</div>
+                <!-- Add more fruit options as needed -->
+            </div>
+
+            <!-- Veggies Category -->
+            <button class="category-button" onclick="toggleCategory('veggies-list')">Veggies</button>
+            <div class="ingredients-list" id="veggies-list">
+                <div class="ingredient-item">Tomato</div>
+                <div class="ingredient-item">Carrot</div>
+                <div class="ingredient-item">Lettuce</div>
+                <div class="ingredient-item">Broccoli</div>
+                <!-- Add more veggie options as needed -->
+            </div>
+
+            <button class="generate-btn" onclick="generateRecipe()">Generate Recipe</button>
         </div>
 
         <!-- Generated Recipe Display Section -->
@@ -40,6 +71,12 @@
     </main>
 
     <script>
+        // Toggle the display of each ingredient list
+        function toggleCategory(categoryId) {
+            const categoryList = document.getElementById(categoryId);
+            categoryList.style.display = categoryList.style.display === 'flex' ? 'none' : 'flex';
+        }
+
         // Select ingredient elements
         const ingredients = document.querySelectorAll('.ingredient-item');
         
@@ -49,11 +86,11 @@
             });
         });
 
+        // Generate a placeholder recipe based on selected ingredients
         function generateRecipe() {
             const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
                 .map(item => item.textContent);
 
-            // Simulate recipe generation (this should be replaced with actual AI logic)
             const recipeDisplay = document.getElementById('recipe-display');
             if (selectedIngredients.length > 0) {
                 recipeDisplay.innerHTML = `
