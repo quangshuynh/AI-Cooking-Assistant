@@ -9,11 +9,20 @@
 <body>
 
     <header>
-        <h1>Chef's F.A.R.T.S</h1>
+        <h1>AI Recipe Generator</h1>
         <p>Get unique recipes based on the ingredients you have!</p>
     </header>
 
     <main>
+        <!-- Allergy Filter Section -->
+        <div class="section" id="allergy-section">
+            <h2>Filter by Allergy</h2>
+            <label><input type="checkbox" class="allergy-checkbox" value="gluten" onclick="filterIngredients()"> Gluten</label>
+            <label><input type="checkbox" class="allergy-checkbox" value="dairy" onclick="filterIngredients()"> Dairy</label>
+            <label><input type="checkbox" class="allergy-checkbox" value="nuts" onclick="filterIngredients()"> Nuts</label>
+            <label><input type="checkbox" class="allergy-checkbox" value="soy" onclick="filterIngredients()"> Soy</label>
+        </div>
+
         <!-- Ingredient Search Box -->
         <div class="section">
             <input type="text" id="ingredient-search" class="search-box" placeholder="Search for ingredients..." oninput="filterIngredients()">
@@ -26,19 +35,19 @@
             <!-- Protein Category -->
             <button class="category-button" onclick="toggleCategory('protein-list')">Protein</button>
             <div class="ingredients-list" id="protein-list">
+                <div class="ingredient-item" data-allergens="soy">Tofu</div>
                 <div class="ingredient-item">Chicken</div>
                 <div class="ingredient-item">Beef</div>
-                <div class="ingredient-item">Tofu</div>
                 <div class="ingredient-item">Eggs</div>
             </div>
 
             <!-- Dairy Category -->
             <button class="category-button" onclick="toggleCategory('dairy-list')">Dairy</button>
             <div class="ingredients-list" id="dairy-list">
-                <div class="ingredient-item">Milk</div>
-                <div class="ingredient-item">Cheese</div>
-                <div class="ingredient-item">Yogurt</div>
-                <div class="ingredient-item">Butter</div>
+                <div class="ingredient-item" data-allergens="dairy">Milk</div>
+                <div class="ingredient-item" data-allergens="dairy">Cheese</div>
+                <div class="ingredient-item" data-allergens="dairy">Yogurt</div>
+                <div class="ingredient-item" data-allergens="dairy">Butter</div>
             </div>
 
             <!-- Fruits Category -->
@@ -54,12 +63,13 @@
             <button class="category-button" onclick="toggleCategory('veggies-list')">Veggies</button>
             <div class="ingredients-list" id="veggies-list">
                 <div class="ingredient-item">Tomato</div>
-                <div class="ingredient-item">Carrot</div>
+                <div class="ingredient-item" data-allergens="nuts">Carrot</div>
                 <div class="ingredient-item">Lettuce</div>
                 <div class="ingredient-item">Broccoli</div>
             </div>
 
             <button class="generate-btn" onclick="generateRecipe()">Generate Recipe</button>
+            <button class="generate-btn" onclick="unselectAllIngredients()">Unselect All</button> <!-- New Unselect All button -->
         </div>
 
         <!-- Generated Recipe Display Section -->

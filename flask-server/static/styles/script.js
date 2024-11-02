@@ -10,11 +10,16 @@ function toggleCategory(categoryId, show = null) {
     }
 }
 
-// filter ingredients based on search input and show matching categories
+// filter ingredients based on search input and allergies
 function filterIngredients() {
     const searchValue = document.getElementById('ingredient-search').value.toLowerCase();
     const ingredients = document.querySelectorAll('.ingredient-item');
 
+    // get selected allergens
+    const selectedAllergies = Array.from(document.querySelectorAll('.allergy-checkbox:checked'))
+        .map(checkbox => checkbox.value);
+
+    // track categories with matches
     const categories = {
         "protein-list": false,
         "dairy-list": false,
@@ -25,10 +30,15 @@ function filterIngredients() {
     ingredients.forEach(item => {
         const ingredientText = item.textContent.toLowerCase();
         const category = item.parentElement.id;
+        const allergens = item.getAttribute('data-allergens') || '';
 
-        if (ingredientText.includes(searchValue)) {
+        // check if ingredient should be hidden due to allergies or search term
+        const isAllergen = selectedAllergies.some(allergy => allergens.includes(allergy));
+        const matchesSearch = ingredientText.includes(searchValue);
+
+        if (!isAllergen && matchesSearch) {
             item.style.display = 'block';
-            categories[category] = true; // mark category to be shown if there's a match
+            categories[category] = true; // show category if there's a matching ingredient
         } else {
             item.style.display = 'none';
         }
@@ -48,6 +58,13 @@ ingredients.forEach(item => {
         item.classList.toggle('selected');
     });
 });
+
+// unselect all ingredients
+function unselectAllIngredients() {
+    ingredients.forEach(item => {
+        item.classList.remove('selected');
+    });
+}
 
 // generate a placeholder recipe based on selected ingredients
 function generateRecipe() {
