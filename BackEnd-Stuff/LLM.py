@@ -1,4 +1,6 @@
-
+#goal create AI prompt for recipe given prompt
+def response():
+    return None
 
 
 #ignore these codes, here for reference for Kai to learn how to use ollama
