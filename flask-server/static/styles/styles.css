@@ -114,3 +114,23 @@ button.generate-btn:hover {
     background-color: #e5533e;
 }
 
+.ingredient-item {
+    background-color: #fff;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.ingredient-item.selected {
+    background-color: #ff6347;
+    color: #fff;
+}
+
+.ingredient-item.disabled {
+    background-color: #f0f0f0;
+    color: #aaa;
+    cursor: not-allowed;
+    border: 1px solid #ddd;
+}
