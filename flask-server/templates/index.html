@@ -9,7 +9,7 @@
 <body>
 
     <header>
-        <h1>🍲 Chef's F.A.R.T.S.</h1>
+        <h1 title="Fantastic And Ready To Serve">🍲 Chef's F.A.R.T.S.</h1>
         <p>Find recipes based on ingredients you have and personalize your preferences!</p>
     </header>
 
@@ -17,6 +17,7 @@
         <!-- Ingredient Search -->
         <div class="section">
             <input type="text" id="ingredient-search" class="search-box" placeholder="🔍 Search for ingredients..." oninput="searchIngredients()">
+            <div id="loading-spinner" class="loading-spinner hidden"></div> 
             <ul id="search-results" class="results-list"></ul>
         </div>
 
@@ -42,7 +43,7 @@
 
             <div class="preferences-card">
                 <label for="cuisine">Cuisine</label>
-                <input type="text" id="cuisine" placeholder="E.g., African, Latin, Asian, Native American">
+                <input type="text" id="cuisine" placeholder="E.g., Italian, Mexican">
             </div>
 
             <div class="preferences-card">
@@ -52,7 +53,7 @@
 
             <div class="preferences-card">
                 <label for="meal-type">Meal Type</label>
-                <input type="text" id="meal-type" placeholder="E.g., Breakfast, Dinner, Lunch">
+                <input type="text" id="meal-type" placeholder="E.g., Breakfast, Dinner">
             </div>
         </div>
 

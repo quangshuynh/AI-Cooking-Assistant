@@ -20,7 +20,6 @@ def search_ingredients():
         top_results = filtered_data.head(5).to_dict(orient='records')
     else:
         top_results = []
-
     return jsonify(top_results)
 
 

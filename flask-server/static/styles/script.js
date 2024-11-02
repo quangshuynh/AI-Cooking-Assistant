@@ -1,17 +1,26 @@
 async function searchIngredients() {
     const query = document.getElementById('ingredient-search').value;
-    const response = await fetch(`/api/ingredients?query=${query}`);
-    const ingredients = await response.json();
-
     const resultsList = document.getElementById('search-results');
-    resultsList.innerHTML = '';
+    const spinner = document.getElementById('loading-spinner');
 
-    ingredients.forEach(ingredient => {
-        const li = document.createElement('li');
-        li.textContent = ingredient.description;
-        li.onclick = () => selectIngredient(ingredient.description);
-        resultsList.appendChild(li);
-    });
+    // Show loading spinner
+    spinner.classList.remove('hidden');
+    resultsList.innerHTML = '';  // Clear previous results
+
+    try {
+        const response = await fetch(`/api/ingredients?query=${query}`);
+        const ingredients = await response.json();
+
+        ingredients.forEach(ingredient => {
+            const li = document.createElement('li');
+            li.textContent = ingredient.description;
+            li.onclick = () => selectIngredient(ingredient.description);
+            resultsList.appendChild(li);
+        });
+    } finally {
+        // Hide loading spinner
+        spinner.classList.add('hidden');
+    }
 }
 
 function selectIngredient(ingredient) {
@@ -21,14 +30,12 @@ function selectIngredient(ingredient) {
     );
 
     if (existingIngredient) {
-        // If ingredient is already selected, unselect it
         existingIngredient.remove();
     } else {
-        // If ingredient is not selected, add it to the selected list and highlight it
         const li = document.createElement('li');
         li.textContent = ingredient;
-        li.classList.add('selected');  // Add selected class for highlighting
-        li.onclick = () => li.remove();  // Remove ingredient on click
+        li.classList.add('selected');
+        li.onclick = () => li.remove();
         selectedList.appendChild(li);
     }
 }
