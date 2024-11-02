@@ -1,9 +1,9 @@
 // toggle the display of each ingredient list
 function toggleCategory(categoryId, show = null) {
     const categoryList = document.getElementById(categoryId);
-    if (show === true) {
+    if(show === true) {
         categoryList.style.display = 'flex';
-    } else if (show === false) {
+    } else if(show === false) {
         categoryList.style.display = 'none';
     } else {
         categoryList.style.display = categoryList.style.display === 'flex' ? 'none' : 'flex';
@@ -32,15 +32,22 @@ function filterIngredients() {
         const category = item.parentElement.id;
         const allergens = item.getAttribute('data-allergens') || '';
 
-        // check if ingredient should be hidden due to allergies or search term
+        // check if ingredient should be disabled due to allergies
         const isAllergen = selectedAllergies.some(allergy => allergens.includes(allergy));
         const matchesSearch = ingredientText.includes(searchValue);
 
-        if (!isAllergen && matchesSearch) {
-            item.style.display = 'block';
-            categories[category] = true; // show category if there's a matching ingredient
+        // if it's an allergen, gray it out and disable selection
+        if(isAllergen) {
+            item.classList.add('disabled');
+            item.classList.remove('selected'); // deselect if already selected
         } else {
-            item.style.display = 'none';
+            item.classList.remove('disabled');
+        }
+
+        // Show ingredient if it matches the search and is not hidden by allergy
+        item.style.display = matchesSearch ? 'block' : 'none';
+        if(matchesSearch && !isAllergen) {
+            categories[category] = true; // Show category if there's a matching ingredient
         }
     });
 
@@ -55,7 +62,10 @@ const ingredients = document.querySelectorAll('.ingredient-item');
 
 ingredients.forEach(item => {
     item.addEventListener('click', () => {
-        item.classList.toggle('selected');
+        // only toggle selection if item is not disabled
+        if(!item.classList.contains('disabled')) {
+            item.classList.toggle('selected');
+        }
     });
 });
 
@@ -72,7 +82,7 @@ function generateRecipe() {
         .map(item => item.textContent);
 
     const recipeDisplay = document.getElementById('recipe-display');
-    if (selectedIngredients.length > 0) {
+    if(selectedIngredients.length > 0) {
         recipeDisplay.innerHTML = `
             <h3>Generated Recipe</h3>
             <p>Ingredients: ${selectedIngredients.join(', ')}</p>
