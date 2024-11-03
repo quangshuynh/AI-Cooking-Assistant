@@ -24,7 +24,9 @@ function filterIngredients() {
         "protein-list": false,
         "dairy-list": false,
         "fruits-list": false,
-        "veggies-list": false
+        "veggies-list": false,
+        "grains-list": false,
+        "misc-list": false
     };
 
     ingredients.forEach(item => {

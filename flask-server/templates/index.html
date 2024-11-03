@@ -20,7 +20,11 @@
             <label><input type="checkbox" class="allergy-checkbox" value="gluten" onclick="filterIngredients()"> Gluten</label>
             <label><input type="checkbox" class="allergy-checkbox" value="dairy" onclick="filterIngredients()"> Dairy</label>
             <label><input type="checkbox" class="allergy-checkbox" value="nuts" onclick="filterIngredients()"> Nuts</label>
+            <label><input type="checkbox" class="allergy-checkbox" value="peanuts" onclick="filterIngredients()"> Peanuts</label>
             <label><input type="checkbox" class="allergy-checkbox" value="soy" onclick="filterIngredients()"> Soy</label>
+            <label><input type="checkbox" class="allergy-checkbox" value="seafood" onclick="filterIngredients()"> Seafood</label>
+            <label><input type="checkbox" class="allergy-checkbox" value="shellfish" onclick="filterIngredients()"> Shellfish</label>
+            <label><input type="checkbox" class="allergy-checkbox" value="eggs" onclick="filterIngredients()"> Eggs</label>
         </div>
 
         <!-- Ingredient Search Box -->
@@ -38,7 +42,15 @@
                 <div class="ingredient-item" data-allergens="soy">Tofu</div>
                 <div class="ingredient-item">Chicken</div>
                 <div class="ingredient-item">Beef</div>
-                <div class="ingredient-item">Eggs</div>
+                <div class="ingredient-item" data-allergens="eggs">Eggs</div>
+                <div class="ingredient-item">Turkey</div>
+                <div class="ingredient-item" data-allergens="shellfish">Shrimp</div>
+                <div class="ingredient-item" data-allergens="seafood">Salmon</div>
+                <div class="ingredient-item">Pork</div>
+                <div class="ingredient-item" data-allergens="shellfish">Crab</div>
+                <div class="ingredient-item">Lamb</div>
+                <div class="ingredient-item">Bacon</div>
+                <div class="ingredient-item">Ham</div>
             </div>
 
             <!-- Dairy Category -->
@@ -48,6 +60,11 @@
                 <div class="ingredient-item" data-allergens="dairy">Cheese</div>
                 <div class="ingredient-item" data-allergens="dairy">Yogurt</div>
                 <div class="ingredient-item" data-allergens="dairy">Butter</div>
+                <div class="ingredient-item" data-allergens="dairy">Cream</div>
+                <div class="ingredient-item" data-allergens="dairy">Sour Cream</div>
+                <div class="ingredient-item" data-allergens="dairy">Ice Cream</div>
+                <div class="ingredient-item" data-allergens="dairy">Whipped Cream</div>
+                <div class="ingredient-item" data-allergens="dairy">Cottage Cheese</div>
             </div>
 
             <!-- Fruits Category -->
@@ -57,6 +74,15 @@
                 <div class="ingredient-item">Banana</div>
                 <div class="ingredient-item">Strawberry</div>
                 <div class="ingredient-item">Orange</div>
+                <div class="ingredient-item">Blueberry</div>
+                <div class="ingredient-item">Pineapple</div>
+                <div class="ingredient-item">Mango</div>
+                <div class="ingredient-item">Grapes</div>
+                <div class="ingredient-item">Peach</div>
+                <div class="ingredient-item">Watermelon</div>
+                <div class="ingredient-item">Kiwi</div>
+                <div class="ingredient-item">Pomegranate</div>
+                <div class="ingredient-item">Avocado</div>
             </div>
 
             <!-- Veggies Category -->
@@ -66,6 +92,44 @@
                 <div class="ingredient-item" data-allergens="nuts">Carrot</div>
                 <div class="ingredient-item">Lettuce</div>
                 <div class="ingredient-item">Broccoli</div>
+                <div class="ingredient-item">Cucumber</div>
+                <div class="ingredient-item">Spinach</div>
+                <div class="ingredient-item">Onion</div>
+                <div class="ingredient-item">Peppers</div>
+                <div class="ingredient-item">Zucchini</div>
+                <div class="ingredient-item">Potato</div>
+                <div class="ingredient-item">Corn</div>
+                <div class="ingredient-item">Asparagus</div>
+                <div class="ingredient-item">Mushroom</div>
+                <div class="ingredient-item">Cauliflower</div>
+            </div>
+
+            <!-- Grains Category -->
+            <button class="category-button" onclick="toggleCategory('grains-list')">Grains</button>
+            <div class="ingredients-list" id="grains-list">
+                <div class="ingredient-item" data-allergens="gluten">Wheat</div>
+                <div class="ingredient-item">Rice</div>
+                <div class="ingredient-item" data-allergens="gluten">Bread</div>
+                <div class="ingredient-item" data-allergens="gluten">Pasta</div>
+                <div class="ingredient-item">Oats</div>
+                <div class="ingredient-item">Quinoa</div>
+                <div class="ingredient-item">Barley</div>
+                <div class="ingredient-item">Couscous</div>
+            </div>
+
+            <!-- Miscellaneous Category -->
+            <button class="category-button" onclick="toggleCategory('misc-list')">Miscellaneous</button>
+            <div class="ingredients-list" id="misc-list">
+                <div class="ingredient-item">Sugar</div>
+                <div class="ingredient-item">Salt</div>
+                <div class="ingredient-item">Olive Oil</div>
+                <div class="ingredient-item">Garlic</div>
+                <div class="ingredient-item">Chili Powder</div>
+                <div class="ingredient-item">Honey</div>
+                <div class="ingredient-item">Maple Syrup</div>
+                <div class="ingredient-item">Pepper</div>
+                <div class="ingredient-item">Vanilla</div>
+                <div class="ingredient-item">Soy Sauce</div>
             </div>
         </div>
 
@@ -85,7 +149,7 @@
                 <option value="Latin">Latin</option>
                 <option value="Asian">Asian</option>
                 <option value="Native American">Native American</option>
-                <option value="other">Other</option> <!-- 'Other' option added -->
+                <option value="other">Other</option>
             </select>
             <!-- Custom cuisine input, hidden by default -->
             <input type="text" id="custom-cuisine" name="custom-cuisine" placeholder="Enter custom cuisine" style="display: none; margin-top: 0.5rem;">
