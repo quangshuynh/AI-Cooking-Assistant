@@ -1,0 +1,21 @@
+class: Recipe
+vectorizer: text2vec-transformers
+properties:
+  - name: recipe_id
+    dataType: text
+    description: Unique identifier for the recipe
+  - name: title
+    dataType: text
+    description: The name of the recipe
+  - name: ingredients
+    dataType: text
+    description: The list of ingredients in the recipe
+  - name: instructions
+    dataType: text
+    description: The cooking instructions for the recipe
+  - name: image_name
+    dataType: text
+    description: The filename of the associated recipe image
+  - name: cleaned_ingredients
+    dataType: text
+    description: Cleaned and standardized list of ingredients
