@@ -210,6 +210,10 @@ def get_recipes(ingredients: list[str]=None, cost: int=0, cuisine: str=None, ser
     #     </div>
     #     """
     #     print(formatted_recipe)
+    output_str = ''
+    for index, name, description, ingredients, instructions in enumerate(output):
+        output_str += f"Recipe {index}:\n[{name}, {description}, {ingredients}, {instructions}]\n"
+    print(output_str)
     return output
 
 if __name__ == '__main__':
