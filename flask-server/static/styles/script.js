@@ -86,6 +86,9 @@ async function generateRecipe() {
         spinner.style.display = 'flex'; 
 
         try {
+            // show the spinner while generating the recipe
+            loadingSpinner.style.display = 'block';
+
             const response = await fetch("/generate_recipe", {
                 method: "POST",
                 headers: {
@@ -143,3 +146,30 @@ function toggleCustomCuisineInput() {
     }
 }
 
+
+function updateProgressBar(progress) {
+    const progressBar = document.getElementById("progress-bar");
+    progressBar.style.width = progress + "%";
+}
+
+async function fetchProgress() {
+    const eventSource = new EventSource("/progress");
+    eventSource.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        updateProgressBar(data.progress);
+
+        // Stop listening when progress reaches 100%
+        if (data.progress >= 100) {
+            eventSource.close();
+        }
+    };
+}
+
+// Call this function when the recipe generation starts
+function startRecipeGeneration() {
+    // Start fetching progress
+    fetchProgress();
+
+    // Other recipe generation logic...
+    generateRecipe();
+}
