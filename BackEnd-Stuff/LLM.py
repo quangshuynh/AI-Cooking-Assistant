@@ -155,7 +155,6 @@ def create_recipe_list(ingredients: list[str]=None, cost: int=0, cuisine: str=No
         except Exception as e:
             pass
 
-ingredients = ['potato', 'curry', 'chicken', 'broth', 'bread sticks']
 cost = 5
 recipes_list = create_recipe_list()
 PROGRESS += 100 / (len(recipes_list)+1)

@@ -79,8 +79,12 @@ async function generateRecipe() {
     const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
         .map(item => item.textContent);
     const recipeDisplay = document.getElementById('recipe-display');
+    const spinner = document.getElementById('loading-spinner');
 
     if (selectedIngredients.length > 0) {
+        recipeDisplay.innerHTML = ''; // 
+        spinner.style.display = 'flex'; 
+
         try {
             const response = await fetch("/generate_recipe", {
                 method: "POST",
@@ -92,15 +96,18 @@ async function generateRecipe() {
 
             const result = await response.json();
 
-            // display the generated recipe as HTML
+
+            spinner.style.display = 'none';
             recipeDisplay.innerHTML = `<h3>Generated Recipe</h3>${result.recipe_html}`;
         } catch (error) {
+            spinner.style.display = 'none';
             recipeDisplay.innerHTML = `<p>Error generating recipe: ${error.message}</p>`;
         }
     } else {
         recipeDisplay.innerHTML = `<p>Please select at least one ingredient to generate a recipe.</p>`;
     }
 }
+
 
 function toggleRecipeDetails(recipeId) {
     const recipeContent = document.getElementById(recipeId);
