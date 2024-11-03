@@ -1,0 +1,31 @@
+classes:
+  - class: Ingredient
+    description: Food ingredients with their properties and embeddings
+    vectorizer: text2vec-transformers
+    moduleConfig:
+      text2vec-transformers:
+        vectorizeClassName: false
+    properties:
+      - name: name
+        dataType: [string]
+        description: Name of the ingredient
+        moduleConfig:
+          text2vec-transformers:
+            skip: false
+            vectorizePropertyName: false
+      - name: category
+        dataType: [string]
+        description: Category of the ingredient (e.g., vegetable, protein, dairy)
+      - name: taste_profile
+        dataType: [string]
+        description: Description of taste (e.g., sweet, savory, umami)
+      - name: cuisine_types
+        dataType: [string[]]
+        description: Types of cuisine this ingredient is commonly used in
+      - name: description
+        dataType: [text]
+        description: Detailed description of the ingredient
+        moduleConfig:
+          text2vec-transformers:
+            skip: false
+            vectorizePropertyName: false
