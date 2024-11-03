@@ -1,7 +1,12 @@
-import ollama
+from ollama import Client
 import ast
 import re
 import time
+
+OLLAMA_HOST = "172.19.32.1:11434"  # Olivier's system
+
+client = Client(host=OLLAMA_HOST)
+client.chat
 
 start_time = time.time()
 
@@ -94,7 +99,7 @@ def write_recipe(name: str, description: str, ingredients: list[str], cost: int=
         global TIME
         TIME += 1
         print(count)
-        response = ollama.chat(
+        response = client.chat(
             model=default_model,
             messages=[system_prompt, user_prompt],
         )['message']['content']
@@ -137,7 +142,7 @@ def create_recipe_list(ingredients: list[str], cost: int=0, cuisine: str=None, s
         TIME += 1
         print(count)
 
-        response = ollama.chat(
+        response = client.chat(
             model=default_model,
             messages=[system_prompt, user_prompt],
         )['message']['content']
