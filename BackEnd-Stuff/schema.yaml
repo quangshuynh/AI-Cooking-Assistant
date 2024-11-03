@@ -1,39 +1,28 @@
 classes:
   - class: Ingredient
-    description: Food ingredients with their properties and safety classifications
-    vectorizer: text2vec-transformers
+    description: "A class representing an ingredient with classification data."
+    vectorizer: "text2vec-transformers"  # Specifies text2vec-transformers as the vectorizer
     moduleConfig:
       text2vec-transformers:
-        vectorizeClassName: false
+        pooling: "mean"  # Optional: you can use "mean", "max", or "cls"
+        vectorizeClassName: False  # Set to True if you want the class name vectorized
     properties:
-      - name: name
-        dataType: [string]
-        description: Name of the ingredient
-        moduleConfig:
-          text2vec-transformers:
-            skip: false
-            vectorizePropertyName: false
-      - name: safety_class
-        dataType: [string]
-        description: Safety classification of the ingredient (e.g., controversial, not harmful)
-        moduleConfig:
-          text2vec-transformers:
-            skip: false
-            vectorizePropertyName: false
+      - name: ingredient
+        description: "The name of the ingredient."
+        dataType: ["text"]
+
+      - name: class
+        description: "The classification of the ingredient (e.g., controversial, not harmful)."
+        dataType: ["text"]
+
       - name: reason
-        dataType: [text]
-        description: Detailed explanation of the safety classification
-        moduleConfig:
-          text2vec-transformers:
-            skip: false
-            vectorizePropertyName: false
+        description: "The reason for the ingredient's classification."
+        dataType: ["text"]
+
       - name: int_label
-        dataType: [number]
-        description: Numerical label for classification (0 for controversial, 2 for not harmful)
+        description: "Numeric label associated with the ingredient's classification."
+        dataType: ["int"]
+
       - name: prompt
-        dataType: [text]
-        description: Original classification prompt for the ingredient
-        moduleConfig:
-          text2vec-transformers:
-            skip: false
-            vectorizePropertyName: false
+        description: "Prompt used for generating insights about the ingredient."
+        dataType: ["text"]
