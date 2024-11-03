@@ -3,13 +3,7 @@ import ast
 import re
 import time
 
-start_time = time.time()
-
-# default_model = ollama.list()['models'][0]['name']
-# default_model = 'llama3.2:1b'
-default_model = 'dolphin-llama3'
-STEPS = 0
-PROGRESS = 0
+default_model = ollama.list()['models'][0]['name']
 
 def extract_recipe(xml_content, pattern):
     # Find the match
@@ -95,6 +89,7 @@ def write_recipe(name: str, description: str, ingredients: list[str]=None, cost:
         global STEPS
         STEPS += 1
         # print(count)
+        global default_model
         response = ollama.chat(
             model=default_model,
             messages=[system_prompt, user_prompt],
@@ -138,6 +133,8 @@ def create_recipe_list(ingredients: list[str]=None, cost: int=0, cuisine: str=No
         STEPS += 1
         # print(count)
 
+        global default_model
+
         response = ollama.chat(
             model=default_model,
             messages=[system_prompt, user_prompt],
@@ -155,26 +152,56 @@ def create_recipe_list(ingredients: list[str]=None, cost: int=0, cuisine: str=No
         except Exception as e:
             pass
 
-ingredients = ['potato', 'curry', 'chicken', 'broth', 'bread sticks']
-cost = 5
-recipes_list = create_recipe_list()
-PROGRESS += 100 / (len(recipes_list)+1)
+def get_recipes(ingredients: list[str]=None, cost: int=0, cuisine: str=None, serving_size: int=0, meal_type: str=None,
+                allergies=None, diet: str=None):
+    start_time = time.time()
 
-recipes = []
-for recipe in recipes_list:
-    recipes.append(write_recipe(*recipe.values()))
-    PROGRESS += 100 / (len(recipes_list) + 1)
-    PROGRESS = min(PROGRESS, 99)
+    model_names = [item['model'] for item in ollama.list()['models']]
 
+    global default_model
 
-end_time = time.time()
+    if 'dolphin-llama3:latest' in model_names:
+        default_model = 'dolphin-llama3:latest'
+    elif 'llama3.2:1b' in model_names:
+        default_model = 'llama3.2:1b'
+    else:
+        default_model = ollama.list()['models'][0]['name']
 
-"""
-print()
-print(f"Program took {end_time - start_time:.2f} seconds, in {STEPS} steps")
-print()
-for index, recipe in enumerate(recipes):
-    print(f"Recipe: {recipes_list[index]['recipe']}; Description: {recipes_list[index]['description']}\nIngredients: {recipe['ingredients']}\nInstructions: {recipe['instructions']}\n\n")
-"""
-for index, recipe in enumerate(recipes):
-    print(f"Recipe {index+1}:\n[{recipes_list[index]['recipe']}, {recipes_list[index]['description']}, {recipes[index]['ingredients']}, {recipes[index]['instructions']}]\n")
+    progress = 0
+    recipes_list = create_recipe_list(ingredients, cost, cuisine, serving_size, meal_type, allergies, diet)
+    progress += 100 / (len(recipes_list) + 1)
+
+    recipes = []
+    for recipe in recipes_list:
+        recipes.append(write_recipe(*recipe.values()))
+        progress += 100 / (len(recipes_list) + 1)
+        progress = min(progress, 99)
+
+    end_time = time.time()
+
+    for index, recipe in enumerate(recipes):
+        recipe_name = recipes_list[index]['recipe']
+        recipe_description = recipes_list[index]['description']
+        recipe_ingredients = recipe['ingredients']
+        recipe_instructions = recipe['instructions']
+
+    # create collapsible HTML structure for each recipe
+        formatted_recipe = f"""
+        <div class="recipe-container">
+            <div class="recipe-header" onclick="toggleRecipeDetails('recipe-{index + 1}')">
+                <h3>Recipe {index + 1}: {recipe_name}</h3>
+            </div>
+            <div class="recipe-content" id="recipe-{index + 1}">
+                <p><strong>Description:</strong> {recipe_description}</p>
+                <p><strong>Ingredients:</strong></p>
+                <ul>
+                    {"".join([f"<li>{ingredient}</li>" for ingredient in recipe_ingredients])}
+                </ul>
+                <p><strong>Instructions:</strong></p>
+                <ol>
+                    {"".join([f"<li>{instruction}</li>" for instruction in recipe_instructions])}
+                </ol>
+            </div>
+        </div>
+        """
+        print(formatted_recipe)
