@@ -4,6 +4,7 @@ import os
 import sys
 import subprocess
 
+
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir), autoescape=True)
 
@@ -16,7 +17,8 @@ def home():
 @app.route("/generate_recipe", methods=["POST"])
 def generate_recipe():
     data = request.get_json()
-    selected_ingredients = data.get('ingredients', [])
+    selected_ingredients = data.get('ingredients', []) #debugging
+    print(selected_ingredients)
     
     # run the LLM and capture the formatted HTML output
     recipe_html = run_llm(selected_ingredients)
@@ -26,16 +28,17 @@ def generate_recipe():
 
 def run_llm(ingredients):
     try:
-        # example of calling LLM.py script and passing ingredients
-        result = subprocess.run([sys.executable, 'BackEnd-Stuff/LLM.py'] + ingredients, capture_output=True, text=True
-        )
-        
-        if result.returncode != 0:  # check if there is any error during execution
+        ingredients_str = "The ingredients are: " + ", ".join(ingredients)
+        result = subprocess.run([sys.executable, 'BackEnd-Stuff/LLM.py', ingredients_str], capture_output=True, text=True)
+    
+
+        if result.returncode != 0: 
             return f"Error generating recipe: {result.stderr}"
         
-        return result.stdout
+        return result.stdout  # return the recipe output
     except Exception as e:
         return f"Exception while generating recipe: {str(e)}"
+
 
 if __name__ == "__main__":
     app.run(debug=True)
