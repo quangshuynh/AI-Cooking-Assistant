@@ -34,8 +34,17 @@ function filterIngredients() {
         const category = item.parentElement.id;
         const allergens = item.getAttribute('data-allergens') || '';
 
-        const isMeat = ['chicken', 'beef', 'turkey', 'shrimp', 'salmon', 'pork', 'crab', 'lamb', 'bacon', 'ham'].includes(ingredientText);
-        const isAnimalProduct = isMeat || ['eggs', 'milk', 'cheese', 'yogurt', 'butter', 'cream'].includes(ingredientText);
+        const isMeat = [
+            'chicken', 'beef', 'turkey', 'shrimp', 'salmon', 'pork', 
+            'crab', 'lamb', 'bacon', 'ham', 'duck', 'venison', 'bison'
+        ].includes(ingredientText);
+        
+        const isAnimalProduct = isMeat || [
+            'eggs', 'milk', 'cheese', 'yogurt', 'butter', 'cream', 
+            'sour cream', 'ice cream', 'whipped cream', 'cottage cheese', 
+            'ghee', 'ricotta', 'feta cheese', 'goat cheese', 'kefir'
+        ].includes(ingredientText);
+        
         
         let matchesSearch = ingredientText.includes(searchValue);
 
