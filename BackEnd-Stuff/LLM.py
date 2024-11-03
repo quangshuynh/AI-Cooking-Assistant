@@ -2,7 +2,6 @@ import ollama
 import ast
 import re
 import time
-import sys
 
 start_time = time.time()
 
@@ -71,7 +70,8 @@ def parse_recipe_dict(xml_content):
     return None
 
 
-def write_recipe(name: str, description: str, ingredients: list[str]=None, cost: int=0, cuisine: str=None, serving_size: int=0, meal_type: str=None, allergies=None, diet: str=None) -> dict[str, str]:
+def write_recipe(name: str, description: str, ingredients: list[str]=None, cost: int=0, cuisine: str=None, serving_size: int=0, meal_type: str=None,
+                allergies=None, diet: str=None) -> dict[str, str]:
     if allergies is None:
         allergies = ['None']
 
@@ -82,7 +82,7 @@ def write_recipe(name: str, description: str, ingredients: list[str]=None, cost:
 
     user_prompt = {'role': 'user', 'content': f"Recipe Name: {name}; "
                                               f"Description: {description}; "
-                                               f"{'Requested Ingredients: ' + ''.join(ingredients) if ingredients else 'No specific ingredient provided'}; "
+                                              f"{'Requested Ingredients: ' + ''.join(ingredients) if ingredients else 'No specific ingredient provided'}; "
                                               f"{'Cost $: ' + str(cost) + '; ' if cost > 0 else ''}"
                                               f"{'Cuisine type: ' + cuisine + '; ' if cuisine else ''}"
                                               f"{'Serving size: ' + str(serving_size) + '; ' if serving_size > 0 else ''}"
@@ -94,7 +94,7 @@ def write_recipe(name: str, description: str, ingredients: list[str]=None, cost:
         count += 1
         global STEPS
         STEPS += 1
-        print(count)
+        # print(count)
         response = ollama.chat(
             model=default_model,
             messages=[system_prompt, user_prompt],
@@ -104,7 +104,7 @@ def write_recipe(name: str, description: str, ingredients: list[str]=None, cost:
 
         try:
             recipe_dict = parse_recipe_dict(response)
-            print(recipe_dict)
+            # print(recipe_dict)
             assert type(recipe_dict) == dict
             assert type(recipe_dict['ingredients']) is list
             assert type(recipe_dict['instructions']) is list
@@ -136,7 +136,7 @@ def create_recipe_list(ingredients: list[str]=None, cost: int=0, cuisine: str=No
         count += 1
         global STEPS
         STEPS += 1
-        print(count)
+        # print(count)
 
         response = ollama.chat(
             model=default_model,
@@ -145,7 +145,7 @@ def create_recipe_list(ingredients: list[str]=None, cost: int=0, cuisine: str=No
 
         try:
             recipe_list_dict = parse_recipe_list(response)
-            print(recipe_list_dict)
+            # print(recipe_list_dict)
             assert type(recipe_list_dict) is list
             assert type(recipe_list_dict[0]) is dict
             assert type(recipe_list_dict[0]['recipe']) is str
@@ -167,11 +167,14 @@ for recipe in recipes_list:
     PROGRESS = min(PROGRESS, 99)
 
 
-
 end_time = time.time()
 
+"""
 print()
 print(f"Program took {end_time - start_time:.2f} seconds, in {STEPS} steps")
 print()
 for index, recipe in enumerate(recipes):
     print(f"Recipe: {recipes_list[index]['recipe']}; Description: {recipes_list[index]['description']}\nIngredients: {recipe['ingredients']}\nInstructions: {recipe['instructions']}\n\n")
+"""
+for index, recipe in enumerate(recipes):
+    print(f"Recipe {index+1}:\n[{recipes_list[index]['recipe']}, {recipes_list[index]['description']}, {recipes[index]['ingredients']}, {recipes[index]['instructions']}]\n")
