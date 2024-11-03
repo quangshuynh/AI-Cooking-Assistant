@@ -102,6 +102,14 @@ async function generateRecipe() {
     }
 }
 
+function toggleRecipeDetails(recipeId) {
+    const recipeContent = document.getElementById(recipeId);
+    if (recipeContent.style.display === "none" || recipeContent.style.display === "") {
+        recipeContent.style.display = "block";
+    } else {
+        recipeContent.style.display = "none";
+    }
+}
 
 
 function updateSelectedIngredientsDisplay() {
