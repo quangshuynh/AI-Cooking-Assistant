@@ -75,21 +75,36 @@ function unselectAllIngredients() {
     });
 }
 
-function generateRecipe() {
+async function generateRecipe() {
     const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
         .map(item => item.textContent);
     const recipeDisplay = document.getElementById('recipe-display');
 
     if (selectedIngredients.length > 0) {
-        recipeDisplay.innerHTML = `
-            <h3>Generated Recipe</h3>
-            <p>Ingredients: ${selectedIngredients.join(', ')}</p>
-            <p>Instructions: Combine the selected ingredients with your favorite spices and cook until perfect!</p>
-        `;
+        try {
+            const response = await fetch("/generate_recipe", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ ingredients: selectedIngredients })
+            });
+
+            const result = await response.json();
+
+            // Display the generated recipe
+            recipeDisplay.innerHTML = `
+                <h3>Generated Recipe</h3>
+                <p>${result.recipe}</p>
+            `;
+        } catch (error) {
+            recipeDisplay.innerHTML = `<p>Error generating recipe: ${error.message}</p>`;
+        }
     } else {
         recipeDisplay.innerHTML = `<p>Please select at least one ingredient to generate a recipe.</p>`;
     }
 }
+
 
 function updateSelectedIngredientsDisplay() {
     const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
