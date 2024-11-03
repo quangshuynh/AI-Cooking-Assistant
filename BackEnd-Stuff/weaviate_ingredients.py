@@ -29,7 +29,9 @@ class IngredientDatabase:
                 http_host=http_host,
                 http_port=http_port,
                 grpc_host=http_host,
-                grpc_port=grpc_port
+                grpc_port=grpc_port,
+                http_secure=False,  # Set to True if using HTTPS
+                grpc_secure=False   # Set to True if using gRPCs
             )
             self.schema = self._load_schema(schema_path)
             self._initialize_schema()
@@ -78,11 +80,11 @@ class IngredientDatabase:
             raise IngredientDatabaseError(f"Ingredient addition failed: {e}") from e
 
     def find_similar_ingredients(self,
-                                 query_text: str,
-                                 limit: int = 5,
-                                 min_similarity: float = 0.7) -> List[Dict[str, Any]]:
+                               query_text: str,
+                               limit: int = 5,
+                               min_similarity: float = 0.7) -> List[Dict[str, Any]]:
         """
-        Find similar ingredients based on text description.
+        Find similar ingredients based on text description and safety classification.
 
         Args:
             query_text: Text to search similar ingredients for
@@ -95,7 +97,7 @@ class IngredientDatabase:
         try:
             vector = self.client.query.get(
                 "Ingredient",
-                ["name", "category", "taste_profile", "cuisine_types", "description"]
+                ["name", "safety_class", "reason", "int_label"]
             ).with_near_text({
                 "concepts": [query_text]
             }).with_additional(["certainty"]).with_limit(limit).do()
@@ -113,101 +115,60 @@ class IngredientDatabase:
             logger.error(f"Failed to search similar ingredients: {e}")
             raise IngredientDatabaseError(f"Similarity search failed: {e}") from e
 
-    def find_ingredient_substitutes(self,
-                                    ingredient_name: str,
-                                    limit: int = 5,
-                                    same_category: bool = True) -> List[Dict[str, Any]]:
+    def find_ingredients_by_safety(self,
+                                 safety_class: str,
+                                 limit: int = 5) -> List[Dict[str, Any]]:
         """
-        Find possible substitutes for an ingredient.
+        Find ingredients by their safety classification.
 
         Args:
-            ingredient_name: Name of the ingredient to find substitutes for
-            limit: Maximum number of substitutes to return
-            same_category: If True, only return substitutes from the same category
+            safety_class: Safety classification to search for (e.g., 'controversial', 'not harmful')
+            limit: Maximum number of results to return
 
         Returns:
-            List of possible substitute ingredients
+            List of ingredients with the specified safety classification
         """
         try:
-            # First get the original ingredient's properties
-            original = self.client.query.get(
+            results = self.client.query.get(
                 "Ingredient",
-                ["name", "category", "taste_profile"]
+                ["name", "safety_class", "reason", "int_label"]
             ).with_where({
-                "path": ["name"],
+                "path": ["safety_class"],
                 "operator": "Equal",
-                "valueString": ingredient_name
-            }).do()
+                "valueString": safety_class
+            }).with_limit(limit).do()
 
-            orig_data = original.get("data", {}).get("Get", {}).get("Ingredient", [])
-            if not orig_data:
-                raise IngredientDatabaseError(f"Ingredient '{ingredient_name}' not found")
-
-            orig_ingredient = orig_data[0]
-
-            # Build query for substitutes
-            query = self.client.query.get(
-                "Ingredient",
-                ["name", "category", "taste_profile", "description"]
-            ).with_near_text({
-                "concepts": [orig_ingredient["taste_profile"]]
-            })
-
-            if same_category:
-                query = query.with_where({
-                    "path": ["category"],
-                    "operator": "Equal",
-                    "valueString": orig_ingredient["category"]
-                })
-
-            results = query.with_additional(["certainty"]).with_limit(limit).do()
-
-            # Filter out the original ingredient
-            substitutes = [
-                result for result in results.get("data", {}).get("Get", {}).get("Ingredient", [])
-                if result["name"] != ingredient_name
-            ]
-
-            return substitutes
+            return results.get("data", {}).get("Get", {}).get("Ingredient", [])
         except WeaviateBaseError as e:
-            logger.error(f"Failed to find substitutes for {ingredient_name}: {e}")
-            raise IngredientDatabaseError(f"Substitute search failed: {e}") from e
-
-    def close(self) -> None:
-        """Close the database connection."""
-        try:
-            self.client.close()
-            logger.info("Database connection closed successfully")
-        except WeaviateBaseError as e:
-            logger.error(f"Error closing database connection: {e}")
-            raise IngredientDatabaseError("Failed to close database connection") from e
+            logger.error(f"Failed to find ingredients by safety class: {e}")
+            raise IngredientDatabaseError(f"Safety class search failed: {e}") from e
 
 
-# Initialize the database
-db = IngredientDatabase(schema_path="schema.yaml")
+# Example usage:
+if __name__ == "__main__":
+    # Initialize the database
+    db = IngredientDatabase(schema_path="schema.yaml")
 
-# Add some ingredients
-tomato = {
-    "name": "Tomato",
-    "category": "vegetable",
-    "taste_profile": "sweet, acidic, umami",
-    "cuisine_types": ["Italian", "Mediterranean", "Mexican"],
-    "description": "Red, juicy fruit commonly used as a vegetable. Rich in umami flavor."
-}
+    # Add an ingredient
+    acacia_gum = {
+        "name": "acacia gum",
+        "safety_class": "not harmful",
+        "reason": "Acacia gum, also known as gum arabic, is a natural dietary fiber used as a food additive.",
+        "int_label": 2
+    }
 
-db.add_ingredient(tomato)
+    db.add_ingredient(acacia_gum)
 
-# Find similar ingredients
-similar = db.find_similar_ingredients(
-    "red acidic fruit vegetable",
-    limit=3
-)
-print("Similar ingredients:", similar)
+    # Find similar ingredients
+    similar = db.find_similar_ingredients(
+        "natural gum ingredient",
+        limit=3
+    )
+    print("Similar ingredients:", similar)
 
-# Find substitutes for tomato
-substitutes = db.find_ingredient_substitutes(
-    "Tomato",
-    limit=3,
-    same_category=True
-)
-print("Possible substitutes:", substitutes)
+    # Find ingredients by safety class
+    safe_ingredients = db.find_ingredients_by_safety(
+        "not harmful",
+        limit=3
+    )
+    print("Safe ingredients:", safe_ingredients)

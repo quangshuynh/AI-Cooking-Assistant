@@ -1,6 +1,6 @@
 classes:
   - class: Ingredient
-    description: Food ingredients with their properties and embeddings
+    description: Food ingredients with their properties and safety classifications
     vectorizer: text2vec-transformers
     moduleConfig:
       text2vec-transformers:
@@ -13,18 +13,26 @@ classes:
           text2vec-transformers:
             skip: false
             vectorizePropertyName: false
-      - name: category
+      - name: safety_class
         dataType: [string]
-        description: Category of the ingredient (e.g., vegetable, protein, dairy)
-      - name: taste_profile
-        dataType: [string]
-        description: Description of taste (e.g., sweet, savory, umami)
-      - name: cuisine_types
-        dataType: [string[]]
-        description: Types of cuisine this ingredient is commonly used in
-      - name: description
+        description: Safety classification of the ingredient (e.g., controversial, not harmful)
+        moduleConfig:
+          text2vec-transformers:
+            skip: false
+            vectorizePropertyName: false
+      - name: reason
         dataType: [text]
-        description: Detailed description of the ingredient
+        description: Detailed explanation of the safety classification
+        moduleConfig:
+          text2vec-transformers:
+            skip: false
+            vectorizePropertyName: false
+      - name: int_label
+        dataType: [number]
+        description: Numerical label for classification (0 for controversial, 2 for not harmful)
+      - name: prompt
+        dataType: [text]
+        description: Original classification prompt for the ingredient
         moduleConfig:
           text2vec-transformers:
             skip: false
