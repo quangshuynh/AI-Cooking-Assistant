@@ -211,10 +211,10 @@ def get_recipes(ingredients: list[str]=None, cost: int=0, cuisine: str=None, ser
     #     """
     #     print(formatted_recipe)
     output_str = ''
-    for index, name, description, ingredients, instructions in enumerate(output):
-        output_str += f"Recipe {index}:\n[{name}, {description}, {ingredients}, {instructions}]\n"
+    for index, outputs in enumerate(output):
+        output_str += f"Recipe {index+1}:\n[{outputs[0]}, {outputs[1]}, {outputs[2]}, {outputs[3]}]\n"
     print(output_str)
     return output
 
-if __name__ == '__main__':
-    print(get_recipes(ingredients=['coconut'], meal_type='desert', cuisine='Indian', serving_size=2))
+# if __name__ == '__main__':
+#     print(get_recipes(ingredients=['coconut'], meal_type='desert', cuisine='Indian', serving_size=2))
