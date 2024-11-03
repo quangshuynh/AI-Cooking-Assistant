@@ -89,7 +89,7 @@
             <button class="category-button" onclick="toggleCategory('veggies-list')">Veggies</button>
             <div class="ingredients-list" id="veggies-list">
                 <div class="ingredient-item">Tomato</div>
-                <div class="ingredient-item" data-allergens="nuts">Carrot</div>
+                <div class="ingredient-item">Carrot</div>
                 <div class="ingredient-item">Lettuce</div>
                 <div class="ingredient-item">Broccoli</div>
                 <div class="ingredient-item">Cucumber</div>
@@ -136,6 +136,10 @@
         <!-- Additional Filters Section -->
         <div class="section" id="additional-filters">
             <h2>Additional Filters</h2>
+
+            <!-- Vegetarian/Vegan Filter -->
+            <label><input type="checkbox" id="vegetarian-filter" onclick="filterIngredients()"> Vegetarian</label>
+            <label><input type="checkbox" id="vegan-filter" onclick="filterIngredients()"> Vegan</label>
 
             <!-- Cost Filter -->
             <label for="cost" data-icon="$">Cost:</label>
