@@ -26,6 +26,7 @@ function filterIngredients() {
         "fruits-list": false,
         "veggies-list": false,
         "grains-list": false,
+        "misc-list": false
     };
 
     ingredients.forEach(item => {
@@ -59,11 +60,11 @@ function filterIngredients() {
 }
 
 const ingredients = document.querySelectorAll('.ingredient-item');
-
 ingredients.forEach(item => {
     item.addEventListener('click', () => {
         if (!item.classList.contains('disabled')) {
             item.classList.toggle('selected');
+            updateSelectedIngredientsDisplay();
         }
     });
 });
@@ -89,3 +90,16 @@ function generateRecipe() {
         recipeDisplay.innerHTML = `<p>Please select at least one ingredient to generate a recipe.</p>`;
     }
 }
+
+function updateSelectedIngredientsDisplay() {
+    const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
+        .map(item => item.textContent);
+    const selectedIngredientsDisplay = document.getElementById('selected-ingredients-display');
+
+    if (selectedIngredients.length > 0) {
+        selectedIngredientsDisplay.innerHTML = `<p>Selected Ingredients: ${selectedIngredients.join(', ')}</p>`;
+    } else {
+        selectedIngredientsDisplay.innerHTML = `<p>No ingredients selected.</p>`;
+    }
+}
+

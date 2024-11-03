@@ -200,3 +200,16 @@ button.generate-btn:hover {
     display: block;
     opacity: 1;
 }
+
+#selected-ingredients-section {
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-bottom: 1rem;
+}
+
+#selected-ingredients-display p {
+    font-size: 1.1rem;
+    color: #333;
+}

@@ -172,7 +172,15 @@
             </select>
         </div>
 
-        <!-- Generate Recipe and Unselect All Buttons -->
+        <!-- Selected Ingredients Display -->
+        <div class="section" id="selected-ingredients-section">
+            <h2>Selected Ingredients</h2>
+            <div id="selected-ingredients-display">
+                <p>No ingredients selected.</p>
+            </div>
+        </div>
+
+        <!-- Additional Filters and Recipe Generator Section -->
         <button class="generate-btn" onclick="generateRecipe()">Generate Recipe</button>
         <button class="generate-btn" onclick="unselectAllIngredients()">Unselect All</button>
 
@@ -183,8 +191,8 @@
                 <p>Select ingredients and click "Generate Recipe" to get started!</p>
             </div>
         </div>
-    </main>
+        </main>
 
-    <script src="../static/styles/script.js"></script>
-</body>
+        <script src="../static/styles/script.js"></script>
+    </body>
 </html>
