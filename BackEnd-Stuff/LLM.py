@@ -179,29 +179,39 @@ def get_recipes(ingredients: list[str]=None, cost: int=0, cuisine: str=None, ser
 
     end_time = time.time()
 
+    output = []
     for index, recipe in enumerate(recipes):
         recipe_name = recipes_list[index]['recipe']
         recipe_description = recipes_list[index]['description']
         recipe_ingredients = recipe['ingredients']
         recipe_instructions = recipe['instructions']
 
-    # create collapsible HTML structure for each recipe
-        formatted_recipe = f"""
-        <div class="recipe-container">
-            <div class="recipe-header" onclick="toggleRecipeDetails('recipe-{index + 1}')">
-                <h3>Recipe {index + 1}: {recipe_name}</h3>
-            </div>
-            <div class="recipe-content" id="recipe-{index + 1}">
-                <p><strong>Description:</strong> {recipe_description}</p>
-                <p><strong>Ingredients:</strong></p>
-                <ul>
-                    {"".join([f"<li>{ingredient}</li>" for ingredient in recipe_ingredients])}
-                </ul>
-                <p><strong>Instructions:</strong></p>
-                <ol>
-                    {"".join([f"<li>{instruction}</li>" for instruction in recipe_instructions])}
-                </ol>
-            </div>
-        </div>
-        """
-        print(formatted_recipe)
+        output.append((recipe_name, recipe_description, recipe_ingredients, recipe_instructions))
+
+    # for index, recipe in enumerate(recipes):
+    #     recipe_name = recipes_list[index]['recipe']
+    #     recipe_description = recipes_list[index]['description']
+    #     recipe_ingredients = recipe['ingredients']
+    #     recipe_instructions = recipe['instructions']
+    #
+    # # create collapsible HTML structure for each recipe
+    #     formatted_recipe = f"""
+    #     <div class="recipe-container">
+    #         <div class="recipe-header" onclick="toggleRecipeDetails('recipe-{index + 1}')">
+    #             <h3>Recipe {index + 1}: {recipe_name}</h3>
+    #         </div>
+    #         <div class="recipe-content" id="recipe-{index + 1}">
+    #             <p><strong>Description:</strong> {recipe_description}</p>
+    #             <p><strong>Ingredients:</strong></p>
+    #             <ul>
+    #                 {"".join([f"<li>{ingredient}</li>" for ingredient in recipe_ingredients])}
+    #             </ul>
+    #             <p><strong>Instructions:</strong></p>
+    #             <ol>
+    #                 {"".join([f"<li>{instruction}</li>" for instruction in recipe_instructions])}
+    #             </ol>
+    #         </div>
+    #     </div>
+    #     """
+    #     print(formatted_recipe)
+    return output
