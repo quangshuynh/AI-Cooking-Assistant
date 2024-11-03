@@ -115,28 +115,30 @@ def write_recipe(name: str, description: str, ingredients: list[str]=None, cost:
     return False
 
 def create_recipe_list(ingredients: list[str]=None, cost: int=0, cuisine: str=None, serving_size: int=0, meal_type: str=None,
-                allergies=None, diet: str=None) -> list[dict[str, str]]:
+                       allergies=None, diet: str=None) -> list[dict[str, str]]:
     if allergies is None:
         allergies = ['None']
+
+    # Ensure ingredients is a list or default to empty list
+    user_prompt = {'role': 'user', 
+                   'content': f"Please provide a recipe that includes the following ingredients: {', '.join(ingredients or [])}. "
+                              f"These ingredients MUST be included in the recipe. "
+                              f"{'Cost $: ' + str(cost) + '; ' if cost > 0 else ''}"
+                              f"{'Cuisine type: ' + cuisine + '; ' if cuisine else ''}"
+                              f"{'Serving size: ' + str(serving_size) + '; ' if serving_size > 0 else ''}"
+                              f"{'Meal type: ' + meal_type + '; ' if meal_type else ''}"
+                              f"{'Allergies: ' + ', '.join(allergies) + '; ' if allergies else ''}"
+                              f"{'Diet: ' + diet + '; ' if diet else ''}"}
 
     count = 0
 
     with open('BackEnd-Stuff/system_prompt2', 'r') as f:
         system_prompt = {'role': 'system', 'content': str(f.read())}
 
-    user_prompt = {'role': 'user', 'content': f"{'Requested Ingredients: ' + ''.join(ingredients) if ingredients else 'No specific ingredient provided'}; "
-                                              f"{'Cost $: ' + str(cost) + '; ' if cost > 0 else ''}"
-                                              f"{'Cuisine type: ' + cuisine + '; ' if cuisine else ''}"
-                                              f"{'Serving size: ' + str(serving_size) + '; ' if serving_size > 0 else ''}"
-                                              f"{'Meal type: ' + meal_type + '; ' if meal_type else ''}"
-                                              f"{'Allergies: ' + ', '.join(allergies) + '; ' if allergies else ''}"
-                                              f"{'Diet: ' + diet + '; ' if diet else ''}"}
-
-    while count<10:
+    while count < 10:
         count += 1
         global STEPS
         STEPS += 1
-        # print(count)
 
         response = ollama.chat(
             model=default_model,
@@ -145,7 +147,6 @@ def create_recipe_list(ingredients: list[str]=None, cost: int=0, cuisine: str=No
 
         try:
             recipe_list_dict = parse_recipe_list(response)
-            # print(recipe_list_dict)
             assert type(recipe_list_dict) is list
             assert type(recipe_list_dict[0]) is dict
             assert type(recipe_list_dict[0]['recipe']) is str
@@ -155,7 +156,10 @@ def create_recipe_list(ingredients: list[str]=None, cost: int=0, cuisine: str=No
         except Exception as e:
             pass
 
-ingredients = ['potato', 'curry', 'chicken', 'broth', 'bread sticks']
+    return []
+
+
+
 cost = 5
 recipes_list = create_recipe_list()
 PROGRESS += 100 / (len(recipes_list)+1)
