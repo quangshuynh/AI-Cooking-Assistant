@@ -1,39 +1,18 @@
-classes:
-  - class: Ingredient
-    description: Food ingredients with their properties and safety classifications
-    vectorizer: text2vec-transformers
-    moduleConfig:
-      text2vec-transformers:
-        vectorizeClassName: false
-    properties:
-      - name: name
-        dataType: [string]
-        description: Name of the ingredient
-        moduleConfig:
-          text2vec-transformers:
-            skip: false
-            vectorizePropertyName: false
-      - name: safety_class
-        dataType: [string]
-        description: Safety classification of the ingredient (e.g., controversial, not harmful)
-        moduleConfig:
-          text2vec-transformers:
-            skip: false
-            vectorizePropertyName: false
-      - name: reason
-        dataType: [text]
-        description: Detailed explanation of the safety classification
-        moduleConfig:
-          text2vec-transformers:
-            skip: false
-            vectorizePropertyName: false
-      - name: int_label
-        dataType: [number]
-        description: Numerical label for classification (0 for controversial, 2 for not harmful)
-      - name: prompt
-        dataType: [text]
-        description: Original classification prompt for the ingredient
-        moduleConfig:
-          text2vec-transformers:
-            skip: false
-            vectorizePropertyName: false
+class: Ingredients
+vectorizer: text2vec-transformers
+properties:
+  - name: ingredient
+    dataType: text
+    description: The name of the ingredient
+  - name: class
+    dataType: text
+    description: The classification of the ingredient (controversial, etc)
+  - name: reason
+    dataType: text
+    description: The reasoning or explanation for the classification
+  - name: int_label
+    dataType: text
+    description: The internal label classification
+  - name: prompt
+    dataType: text
+    description: The prompt text associated with the ingredient
