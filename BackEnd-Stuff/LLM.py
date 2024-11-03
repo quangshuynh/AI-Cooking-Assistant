@@ -86,8 +86,6 @@ def write_recipe(name: str, description: str, ingredients: list[str]=None, cost:
 
     while count<10:
         count += 1
-        global STEPS
-        STEPS += 1
         # print(count)
         global default_model
         response = ollama.chat(
@@ -129,8 +127,6 @@ def create_recipe_list(ingredients: list[str]=None, cost: int=0, cuisine: str=No
 
     while count<10:
         count += 1
-        global STEPS
-        STEPS += 1
         # print(count)
 
         global default_model
@@ -215,3 +211,6 @@ def get_recipes(ingredients: list[str]=None, cost: int=0, cuisine: str=None, ser
     #     """
     #     print(formatted_recipe)
     return output
+
+if __name__ == '__main__':
+    print(get_recipes(ingredients=['coconut'], meal_type='desert', cuisine='Indian', serving_size=2))
