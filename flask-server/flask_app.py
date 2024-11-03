@@ -17,19 +17,20 @@ def home():
 @app.route("/generate_recipe", methods=["POST"])
 def generate_recipe():
     data = request.get_json()
-    selected_ingredients = data.get('ingredients', []) #debugging
-    print(selected_ingredients)
+    selected_ingredients = data.get('ingredients', []) 
+    cuisine = data.get("cuisine", "")
     
     # run the LLM and capture the formatted HTML output
-    recipe_html = run_llm(selected_ingredients)
+    recipe_html = run_llm(selected_ingredients, cuisine)
     
     return jsonify({"recipe_html": recipe_html})
 
 
-def run_llm(ingredients):
+def run_llm(ingredients, cuisine):
     try:
         ingredients_str = "The ingredients are: " + ", ".join(ingredients)
-        result = subprocess.run([sys.executable, 'BackEnd-Stuff/LLM.py', ingredients_str], capture_output=True, text=True)
+        cuisine_str = "The cuisine is: " + ", ".join(cuisine)
+        result = subprocess.run([sys.executable, 'backend/LLM.py', ingredients_str, cuisine_str], capture_output=True, text=True)
     
 
         if result.returncode != 0: 

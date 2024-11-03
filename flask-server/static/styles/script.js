@@ -87,28 +87,29 @@ function unselectAllIngredients() {
 async function generateRecipe() {
     const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
         .map(item => item.textContent);
+
+    const selectedCuisine = document.getElementById('cuisine').value;
+    const customCuisine = document.getElementById('custom-cuisine').value;
+
+    const cuisine = selectedCuisine === 'other' ? customCuisine : selectedCuisine;
+
     const recipeDisplay = document.getElementById('recipe-display');
     const spinner = document.getElementById('loading-spinner');
 
     if (selectedIngredients.length > 0) {
-        recipeDisplay.innerHTML = ''; // 
+        recipeDisplay.innerHTML = ''; 
         spinner.style.display = 'flex'; 
 
         try {
-            // show the spinner while generating the recipe
-            loadingSpinner.style.display = 'block';
-
             const response = await fetch("/generate_recipe", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ ingredients: selectedIngredients })
+                body: JSON.stringify({ ingredients: selectedIngredients, cuisine: cuisine })  // Added cuisine here
             });
 
             const result = await response.json();
-
-
             spinner.style.display = 'none';
             recipeDisplay.innerHTML = `<h3>Generated Recipe</h3>${result.recipe_html}`;
         } catch (error) {
@@ -119,6 +120,8 @@ async function generateRecipe() {
         recipeDisplay.innerHTML = `<p>Please select at least one ingredient to generate a recipe.</p>`;
     }
 }
+
+
 
 
 function toggleRecipeDetails(recipeId) {
