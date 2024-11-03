@@ -44,4 +44,4 @@ def response_recipe(ingredients: list[str], cost: int = "all", cuisine: str = "a
     #code goes here
     return result
 
-response_recipe(["chicken", "corn", "fish", "corn flakes"], 30, "American")
+response_recipe(["beef", "corn", "carrots"], 30, "Korean", 4, "dinner", "seafood")
