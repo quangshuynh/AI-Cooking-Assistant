@@ -13,5 +13,6 @@ def home():
     template = jinja_env.get_template('index.html')
     return template.render()
 
+
 if __name__ == "__main__":
     app.run(debug=True)

@@ -76,7 +76,7 @@ def write_recipe(name: str, description: str, ingredients: list[str], cost: int=
 
     count = 0
 
-    with open('system_prompt', 'r') as f:
+    with open('BackEnd-Stuff/system_prompt', 'r') as f:
         system_prompt = {'role': 'system', 'content': str(f.read())}
 
     user_prompt = {'role': 'user', 'content': f"Recipe Name: {name}; "
@@ -120,7 +120,7 @@ def create_recipe_list(ingredients: list[str], cost: int=0, cuisine: str=None, s
 
     count = 0
 
-    with open('system_prompt2', 'r') as f:
+    with open('BackEnd-Stuff/system_prompt2', 'r') as f:
         system_prompt = {'role': 'system', 'content': str(f.read())}
 
     user_prompt = {'role': 'user', 'content': f"Requested Ingredients: {', '.join(ingredients)}; "
