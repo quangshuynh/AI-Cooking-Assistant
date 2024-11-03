@@ -92,11 +92,8 @@ async function generateRecipe() {
 
             const result = await response.json();
 
-            // Display the generated recipe
-            recipeDisplay.innerHTML = `
-                <h3>Generated Recipe</h3>
-                <p>${result.recipe}</p>
-            `;
+            // display the generated recipe as HTML
+            recipeDisplay.innerHTML = `<h3>Generated Recipe</h3>${result.recipe_html}`;
         } catch (error) {
             recipeDisplay.innerHTML = `<p>Error generating recipe: ${error.message}</p>`;
         }
@@ -104,6 +101,7 @@ async function generateRecipe() {
         recipeDisplay.innerHTML = `<p>Please select at least one ingredient to generate a recipe.</p>`;
     }
 }
+
 
 
 function updateSelectedIngredientsDisplay() {

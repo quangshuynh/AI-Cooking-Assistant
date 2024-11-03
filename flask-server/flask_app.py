@@ -18,9 +18,11 @@ def generate_recipe():
     data = request.get_json()
     selected_ingredients = data.get('ingredients', [])
     
-    recipe = run_llm(selected_ingredients)  # call LLM.py with the selected ingredients and get the result
+    # run the LLM and capture the formatted HTML output
+    recipe_html = run_llm(selected_ingredients)
     
-    return jsonify({"recipe": recipe})
+    return jsonify({"recipe_html": recipe_html})
+
 
 def run_llm(ingredients):
     try:

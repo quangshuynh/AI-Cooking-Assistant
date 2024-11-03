@@ -231,32 +231,25 @@ button.generate-btn:hover {
     margin: 0;
 }
 
-/* Recipe container styles */
-.recipe-container {
+.recipe {
     margin-bottom: 1rem;
+    padding: 1rem;
     border: 1px solid #ddd;
     border-radius: 5px;
     background-color: #fff;
-    padding: 1rem;
 }
 
-/* Recipe header styles */
-.recipe-header {
-    cursor: pointer;
-    background-color: #ff6347;
-    padding: 0.5rem;
-    border-radius: 5px;
-    color: white;
-    font-weight: bold;
+.recipe h3 {
+    color: #ff6347;
+    margin-bottom: 0.5rem;
 }
 
-/* Recipe content styles */
-.recipe-content {
-    margin-top: 1rem;
-    display: none;
-}
-
-.recipe-content ul,
-.recipe-content ol {
+.recipe ul, .recipe ol {
     margin-left: 20px;
+    padding-left: 1rem;
 }
+
+.recipe p {
+    margin: 0.5rem 0;
+}
+

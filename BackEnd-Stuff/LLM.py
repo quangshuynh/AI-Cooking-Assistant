@@ -177,4 +177,24 @@ for index, recipe in enumerate(recipes):
     print(f"Recipe: {recipes_list[index]['recipe']}; Description: {recipes_list[index]['description']}\nIngredients: {recipe['ingredients']}\nInstructions: {recipe['instructions']}\n\n")
 """
 for index, recipe in enumerate(recipes):
-    print(f"Recipe {index+1}:\n[{recipes_list[index]['recipe']}, {recipes_list[index]['description']}, {recipes[index]['ingredients']}, {recipes[index]['instructions']}]\n")
+    recipe_name = recipes_list[index]['recipe']
+    recipe_description = recipes_list[index]['description']
+    recipe_ingredients = recipe['ingredients']
+    recipe_instructions = recipe['instructions']
+    
+    # create HTML structure for each recipe
+    formatted_recipe = f"""
+    <div class="recipe">
+        <h3>Recipe {index + 1}: {recipe_name}</h3>
+        <p><strong>Description:</strong> {recipe_description}</p>
+        <p><strong>Ingredients:</strong></p>
+        <ul>
+            {"".join([f"<li>{ingredient}</li>" for ingredient in recipe_ingredients])}
+        </ul>
+        <p><strong>Instructions:</strong></p>
+        <ol>
+            {"".join([f"<li>{instruction}</li>" for instruction in recipe_instructions])}
+        </ol>
+    </div>
+    """
+    print(formatted_recipe)
