@@ -79,9 +79,13 @@ async function generateRecipe() {
     const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
         .map(item => item.textContent);
     const recipeDisplay = document.getElementById('recipe-display');
+    const loadingSpinner = document.getElementById('loading-spinner');
 
     if (selectedIngredients.length > 0) {
         try {
+            // show the spinner while generating the recipe
+            loadingSpinner.style.display = 'block';
+
             const response = await fetch("/generate_recipe", {
                 method: "POST",
                 headers: {
@@ -92,15 +96,20 @@ async function generateRecipe() {
 
             const result = await response.json();
 
+            // hide the spinner once the recipe is ready
+            loadingSpinner.style.display = 'none';
+
             // display the generated recipe as HTML
             recipeDisplay.innerHTML = `<h3>Generated Recipe</h3>${result.recipe_html}`;
         } catch (error) {
+            loadingSpinner.style.display = 'none'; // Hide the spinner in case of error
             recipeDisplay.innerHTML = `<p>Error generating recipe: ${error.message}</p>`;
         }
     } else {
         recipeDisplay.innerHTML = `<p>Please select at least one ingredient to generate a recipe.</p>`;
     }
 }
+
 
 function toggleRecipeDetails(recipeId) {
     const recipeContent = document.getElementById(recipeId);
@@ -136,3 +145,30 @@ function toggleCustomCuisineInput() {
     }
 }
 
+
+function updateProgressBar(progress) {
+    const progressBar = document.getElementById("progress-bar");
+    progressBar.style.width = progress + "%";
+}
+
+async function fetchProgress() {
+    const eventSource = new EventSource("/progress");
+    eventSource.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        updateProgressBar(data.progress);
+
+        // Stop listening when progress reaches 100%
+        if (data.progress >= 100) {
+            eventSource.close();
+        }
+    };
+}
+
+// Call this function when the recipe generation starts
+function startRecipeGeneration() {
+    // Start fetching progress
+    fetchProgress();
+
+    // Other recipe generation logic...
+    generateRecipe();
+}
