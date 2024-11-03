@@ -1,13 +1,17 @@
+/* Import Roboto font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+/* Apply Roboto font */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif; /* Changed from Arial to Roboto */
     margin: 0;
     padding: 0;
-    background-color: #f8f8f8;
+    background-color: #e9e4e4;
 }
 
 header {
     background-color: #ff6347;
-    color: white;
+    color: rgb(243, 239, 239);
     padding: 1rem;
     text-align: center;
 }
@@ -18,7 +22,7 @@ h1 {
 }
 
 h1::after {
-    content: "Fantastic And Ready To Serve";
+    content: "Chef's Fantastic And Ready To Serve";
     position: absolute;
     top: 110%; /* Position just below the h1 */
     left: 50%;
@@ -39,7 +43,6 @@ h1:hover::after {
     opacity: 1;
     transform: translateX(-50%) translateY(-3px); /* Adds a slight bounce */
 }
-
 
 main {
     padding: 2rem;
@@ -181,7 +184,7 @@ button.generate-btn:hover {
 
 #additional-filters label::before {
     content: attr(data-icon); 
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif; /* Keep Roboto here too */
     color: #ff6347;
     font-size: 1.2rem;
     margin-right: 0.5rem;
