@@ -17,4 +17,5 @@ class DatabaseManager:
             logger.info("Weaviate client initialized successfully.")
         except WeaviateBaseError as e:
             logger.error(f"Failed to initialize Weaviate client: {e}")
+            # Line 21 changed from MemoryManagerError to Memory Error
             raise MemoryError("Weaviate client initialization failed.") from e
