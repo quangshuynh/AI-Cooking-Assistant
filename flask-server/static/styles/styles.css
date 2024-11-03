@@ -231,11 +231,32 @@ button.generate-btn:hover {
     margin: 0;
 }
 
-/* Recipe Section */
-#recipe-section {
-    margin-top: 1rem;
+/* Recipe container styles */
+.recipe-container {
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+    padding: 1rem;
 }
 
-#recipe-section h2 {
-    margin-bottom: 0.5rem;
+/* Recipe header styles */
+.recipe-header {
+    cursor: pointer;
+    background-color: #ff6347;
+    padding: 0.5rem;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+}
+
+/* Recipe content styles */
+.recipe-content {
+    margin-top: 1rem;
+    display: none;
+}
+
+.recipe-content ul,
+.recipe-content ol {
+    margin-left: 20px;
 }
