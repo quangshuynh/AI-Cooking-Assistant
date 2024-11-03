@@ -1,205 +1,199 @@
-/* General Styles */
 body {
     font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
     background-color: #f8f8f8;
-    color: #333;
 }
 
 header {
     background-color: #ff6347;
     color: white;
-    padding: 1.2rem;
+    padding: 1rem;
     text-align: center;
-    font-size: 1.2rem;
 }
 
+h1 {
+    position: relative;
+    cursor: pointer;
+}
+
+h1::after {
+    content: "Fantastic And Ready To Serve";
+    position: absolute;
+    top: 110%; /* Position just below the h1 */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+    font-size: 0.9rem;
+    opacity: 0;
+    white-space: nowrap;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+h1:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-3px); /* Adds a slight bounce */
+}
+
+
 main {
-    padding: 1.5rem;
+    padding: 2rem;
     max-width: 800px;
     margin: auto;
 }
 
 .section {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 }
 
-/* Ingredient Search */
+.section h2 {
+    color: #ff6347;
+}
+
 .search-box {
     width: 100%;
-    padding: 0.6rem;
-    font-size: 0.95rem;
+    padding: 0.75rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
     border: 1px solid #ddd;
-    border-radius: 6px;
-    box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
-}
-
-.results-list, .selected-ingredients-list {
-    list-style: none;
-    padding: 0;
-}
-
-.results-list li, .selected-ingredients-list li {
-    padding: 0.4rem;
-    margin: 0.4rem 0;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: background-color 0.3s;
-}
-
-.results-list li:hover {
-    background-color: #f0f0f0;
-}
-
-/* Highlight selected ingredients */
-.selected-ingredients-list li.selected {
-    background-color: #ff6347;
-    color: white;
-}
-
-/* Preferences Section */
-.preferences-section {
-    margin-top: 1.5rem;
-}
-
-.preferences-section h2 {
-    color: #ff6347;
-    font-size: 1.2rem;
-}
-
-/* Preferences Card */
-.preferences-card {
-    display: flex;
-    flex-direction: column;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    padding: 0.8rem;
-    border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 0.8rem;
-}
-
-.preferences-card label {
-    font-weight: bold;
-    color: #555;
-    margin-bottom: 0.3rem;
-    font-size: 0.9rem;
-}
-
-.preferences-card input {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
     border-radius: 5px;
-    font-size: 0.9rem;
-    transition: border-color 0.2s;
 }
 
-.preferences-card input:focus {
-    border-color: #ff6347;
-    outline: none;
-    box-shadow: 0 0 3px rgba(255, 99, 71, 0.3);
-}
-
-/* Generate Button */
-button.generate-btn {
-    display: inline-block;
-    padding: 0.6rem 1.2rem;
+.category-button {
     background-color: #ff6347;
     color: white;
     border: none;
-    border-radius: 8px;
+    padding: 0.75rem;
+    text-align: left;
+    width: 100%;
+    font-size: 1.1rem;
     cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: bold;
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
     transition: background-color 0.3s;
+}
+
+.category-button:hover {
+    background-color: #e5533e;
+}
+
+.ingredients-list {
+    display: none;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.ingredient-item {
+    background-color: #fff;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.ingredient-item.selected {
+    background-color: #ff6347;
+    color: #fff;
+}
+
+.ingredient-item.disabled {
+    background-color: #f0f0f0;
+    color: #aaa;
+    cursor: not-allowed;
+    border: 1px solid #ddd;
+}
+
+button.generate-btn {
+    padding: 0.5rem 1rem;
+    background-color: #ff6347;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
 }
 
 button.generate-btn:hover {
     background-color: #e5533e;
 }
 
-/* Recipe Display */
 .recipe-display {
     background-color: #fff;
-    padding: 0.8rem;
-    border-radius: 8px;
+    padding: 1rem;
+    border-radius: 5px;
     border: 1px solid #ddd;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    font-size: 1rem;
-    line-height: 1.4;
 }
 
-/* General Styles */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f8f8;
+#additional-filters {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#additional-filters h2 {
+    font-size: 1.3rem;
     color: #333;
+    margin-bottom: 0.5rem;
 }
 
-header {
-    background-color: #ff6347;
-    color: white;
-    padding: 1.2rem;
-    text-align: center;
-    font-size: 1.2rem;
+#additional-filters label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    color: #666;
 }
 
-header h1 {
-    position: relative;
-    display: inline-block;
+#additional-filters input[type="number"],
+#additional-filters select {
+    flex: 1;
+    padding: 0.5rem;
+    margin-left: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#additional-filters input[type="number"]:focus,
+#additional-filters select:focus {
+    border-color: #ff6347;
+    box-shadow: 0 0 0 3px rgba(255, 99, 71, 0.2);
+}
+
+#additional-filters select {
     cursor: pointer;
-    transition: transform 0.3s;
 }
 
-header h1:hover {
-    transform: scale(1.05);
+#additional-filters label::before {
+    content: attr(data-icon); 
+    font-family: Arial, sans-serif;
+    color: #ff6347;
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
 }
 
-header h1::after {
-    content: "Chef's Fantastic And Ready To Serve";
-    position: absolute;
-    left: 50%;
-    top: 100%;
-    width: max-content;
-    padding: 0.2rem 0.4rem;
-    font-size: 0.9rem;
-    color: #ffe4b5;
-    background-color: rgba(0, 0, 0, 0.8);
-    border-radius: 4px;
-    transform: translateX(-50%) scale(0.9);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s, transform 0.3s;
-    white-space: nowrap;
-    margin-top: 0.5rem;
-}
-
-header h1:hover::after {
-    opacity: 1;
-    transform: translateX(-50%) scale(1);
-}
-
-
-/* Loading Spinner */
-.loading-spinner {
-    width: 30px;
-    height: 30px;
-    border: 4px solid #ddd;
-    border-top-color: #ff6347;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 10px auto;
-}
-
-.hidden {
+#custom-cuisine {
     display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
 }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+#custom-cuisine[style*="block"] {
+    display: block;
+    opacity: 1;
 }
-
-
