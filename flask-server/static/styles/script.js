@@ -97,7 +97,7 @@ function updateSelectedIngredientsDisplay() {
     const selectedIngredientsDisplay = document.getElementById('selected-ingredients-display');
 
     if (selectedIngredients.length > 0) {
-        selectedIngredientsDisplay.innerHTML = `<p>Selected Ingredients: ${selectedIngredients.join(', ')}</p>`;
+        selectedIngredientsDisplay.innerHTML = `<p>${selectedIngredients.join(', ')}</p>`;
     } else {
         selectedIngredientsDisplay.innerHTML = `<p>No ingredients selected.</p>`;
     }

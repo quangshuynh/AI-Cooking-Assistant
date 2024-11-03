@@ -201,15 +201,41 @@ button.generate-btn:hover {
     opacity: 1;
 }
 
+
+/* Selected Ingredients Section */
 #selected-ingredients-section {
-    background-color: #fff;
-    padding: 1rem;
+    background-color: #e9e4e4; /* Gray background */
+    padding: 0; /* Remove padding to align it */
     border-radius: 5px;
-    border: 1px solid #ddd;
     margin-bottom: 1rem;
+}
+
+#selected-ingredients-display {
+    background-color: #fff;
+    padding: 0.75rem;
+    border-radius: 5px;
+    box-shadow: none; 
+    outline: none; 
+    border: none; 
+    margin: 0; 
+}
+
+#selected-ingredients-section h2 {
+    padding-left: 0rem; 
+    margin: 0 0 0.5rem 0;
 }
 
 #selected-ingredients-display p {
     font-size: 1.1rem;
     color: #333;
+    margin: 0;
+}
+
+/* Recipe Section */
+#recipe-section {
+    margin-top: 1rem;
+}
+
+#recipe-section h2 {
+    margin-bottom: 0.5rem;
 }
