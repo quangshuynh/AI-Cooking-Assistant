@@ -39,7 +39,7 @@ A Python list of 3 dictionaries containing ONLY:
 'description': A detailed description of the meal
 
 The 3 dictionaries must contain only these two keys and be formatted as:
-{'ingredients': ['...'], 'instructions': ['instruction1', 'instruction2', ...]}
+{'recipe': 'recipe name', 'description': 'recipe description'}
 </final_output>
 Important:
 

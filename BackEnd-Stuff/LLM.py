@@ -8,7 +8,8 @@ start_time = time.time()
 # default_model = ollama.list()['models'][0]['name']
 # default_model = 'llama3.2:1b'
 default_model = 'dolphin-llama3'
-TIME = 0
+STEPS = 0
+PROGRESS = 0
 
 def extract_recipe(xml_content, pattern):
     # Find the match
@@ -69,7 +70,7 @@ def parse_recipe_dict(xml_content):
     return None
 
 
-def write_recipe(name: str, description: str, ingredients: list[str], cost: int=0, cuisine: str=None, serving_size: int=0, meal_type: str=None,
+def write_recipe(name: str, description: str, ingredients: list[str]=None, cost: int=0, cuisine: str=None, serving_size: int=0, meal_type: str=None,
                 allergies=None, diet: str=None) -> dict[str, str]:
     if allergies is None:
         allergies = ['None']
@@ -81,7 +82,7 @@ def write_recipe(name: str, description: str, ingredients: list[str], cost: int=
 
     user_prompt = {'role': 'user', 'content': f"Recipe Name: {name}; "
                                               f"Description: {description}; "
-                                              f"Requested Ingredients: {', '.join(ingredients)}; "
+                                              f"{'Requested Ingredients: ' + ''.join(ingredients) if ingredients else 'No specific ingredient provided'}; "
                                               f"{'Cost $: ' + str(cost) + '; ' if cost > 0 else ''}"
                                               f"{'Cuisine type: ' + cuisine + '; ' if cuisine else ''}"
                                               f"{'Serving size: ' + str(serving_size) + '; ' if serving_size > 0 else ''}"
@@ -91,8 +92,8 @@ def write_recipe(name: str, description: str, ingredients: list[str], cost: int=
 
     while count<10:
         count += 1
-        global TIME
-        TIME += 1
+        global STEPS
+        STEPS += 1
         print(count)
         response = ollama.chat(
             model=default_model,
@@ -113,7 +114,7 @@ def write_recipe(name: str, description: str, ingredients: list[str], cost: int=
             pass
     return False
 
-def create_recipe_list(ingredients: list[str], cost: int=0, cuisine: str=None, serving_size: int=0, meal_type: str=None,
+def create_recipe_list(ingredients: list[str]=None, cost: int=0, cuisine: str=None, serving_size: int=0, meal_type: str=None,
                 allergies=None, diet: str=None) -> list[dict[str, str]]:
     if allergies is None:
         allergies = ['None']
@@ -123,7 +124,7 @@ def create_recipe_list(ingredients: list[str], cost: int=0, cuisine: str=None, s
     with open('system_prompt2', 'r') as f:
         system_prompt = {'role': 'system', 'content': str(f.read())}
 
-    user_prompt = {'role': 'user', 'content': f"Requested Ingredients: {', '.join(ingredients)}; "
+    user_prompt = {'role': 'user', 'content': f"{'Requested Ingredients: ' + ''.join(ingredients) if ingredients else 'No specific ingredient provided'}; "
                                               f"{'Cost $: ' + str(cost) + '; ' if cost > 0 else ''}"
                                               f"{'Cuisine type: ' + cuisine + '; ' if cuisine else ''}"
                                               f"{'Serving size: ' + str(serving_size) + '; ' if serving_size > 0 else ''}"
@@ -133,8 +134,8 @@ def create_recipe_list(ingredients: list[str], cost: int=0, cuisine: str=None, s
 
     while count<10:
         count += 1
-        global TIME
-        TIME += 1
+        global STEPS
+        STEPS += 1
         print(count)
 
         response = ollama.chat(
@@ -156,13 +157,20 @@ def create_recipe_list(ingredients: list[str], cost: int=0, cuisine: str=None, s
 
 ingredients = ['potato', 'curry', 'chicken', 'broth', 'bread sticks']
 cost = 5
-recipes_list = create_recipe_list(ingredients=ingredients, cost=cost)
-recipes = [write_recipe(*recipe.values(), ingredients=ingredients, cost=cost) for recipe in recipes_list]
+recipes_list = create_recipe_list()
+PROGRESS += 100 / (len(recipes_list)+1)
+
+recipes = []
+for recipe in recipes_list:
+    recipes.append(write_recipe(*recipe.values()))
+    PROGRESS += 100 / (len(recipes_list) + 1)
+    PROGRESS = min(PROGRESS, 99)
+
 
 end_time = time.time()
 
 print()
-print(f"Program took {end_time - start_time:.4f} seconds")
+print(f"Program took {end_time - start_time:.2f} seconds, in {STEPS} steps")
 print()
 for index, recipe in enumerate(recipes):
     print(f"Recipe: {recipes_list[index]['recipe']}; Description: {recipes_list[index]['description']}\nIngredients: {recipe['ingredients']}\nInstructions: {recipe['instructions']}\n\n")
