@@ -19,18 +19,20 @@ def generate_recipe():
     data = request.get_json()
     selected_ingredients = data.get('ingredients', []) 
     cuisine = data.get("cuisine", "")
+    meal_type = data.get("meal_type", "")
     
     # run the LLM and capture the formatted HTML output
-    recipe_html = run_llm(selected_ingredients, cuisine)
+    recipe_html = run_llm(selected_ingredients, cuisine, meal_type)
     
     return jsonify({"recipe_html": recipe_html})
 
 
-def run_llm(ingredients, cuisine):
+def run_llm(ingredients, cuisine, meal_type):
     try:
         ingredients_str = "The ingredients are: " + ", ".join(ingredients)
         cuisine_str = "The cuisine is: " + ", ".join(cuisine)
-        result = subprocess.run([sys.executable, 'backend/LLM.py', ingredients_str, cuisine_str], capture_output=True, text=True)
+        meal_type = "The meal time (for example: breakfast, lunch, dinner) is:" + ", ".join(meal_type)
+        result = subprocess.run([sys.executable, 'backend/LLM.py', ingredients_str, cuisine_str, meal_type], capture_output=True, text=True)
     
 
         if result.returncode != 0: 

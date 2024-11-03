@@ -90,8 +90,9 @@ async function generateRecipe() {
 
     const selectedCuisine = document.getElementById('cuisine').value;
     const customCuisine = document.getElementById('custom-cuisine').value;
-
     const cuisine = selectedCuisine === 'other' ? customCuisine : selectedCuisine;
+
+    const mealType = document.getElementById('meal-type').value; // Capture meal type
 
     const recipeDisplay = document.getElementById('recipe-display');
     const spinner = document.getElementById('loading-spinner');
@@ -106,7 +107,7 @@ async function generateRecipe() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ ingredients: selectedIngredients, cuisine: cuisine })  // Added cuisine here
+                body: JSON.stringify({ ingredients: selectedIngredients, cuisine: cuisine, meal_type: mealType })  
             });
 
             const result = await response.json();
@@ -120,8 +121,6 @@ async function generateRecipe() {
         recipeDisplay.innerHTML = `<p>Please select at least one ingredient to generate a recipe.</p>`;
     }
 }
-
-
 
 
 function toggleRecipeDetails(recipeId) {
