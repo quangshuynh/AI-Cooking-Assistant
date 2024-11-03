@@ -103,3 +103,15 @@ function updateSelectedIngredientsDisplay() {
     }
 }
 
+function toggleCustomCuisineInput() {
+    const cuisineSelect = document.getElementById('cuisine');
+    const customCuisineInput = document.getElementById('custom-cuisine');
+    if (cuisineSelect.value === 'other') {
+        customCuisineInput.style.display = 'block';
+        customCuisineInput.style.opacity = '1';
+    } else {
+        customCuisineInput.style.display = 'none';
+        customCuisineInput.style.opacity = '0';
+    }
+}
+
