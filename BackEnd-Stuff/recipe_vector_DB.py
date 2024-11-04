@@ -72,6 +72,46 @@ class RecipeDB:
             traceback.print_exc()
             raise
 
+    def close(self):
+        try:
+            if hasattr(self, 'client'):
+                self.client.close()
+        except Exception as e:
+            print(f"Error closing connection: {e}")
+
+    def batch_import_recipes(self, recipes_list: List[Dict[str, Any]]) -> bool:
+        try:
+            total = len(recipes_list)
+            batch_size = 100
+            batches = (total + batch_size - 1) // batch_size
+
+            print(f"\nImporting {total} recipes in {batches} batches:")
+
+            for batch_num in range(batches):
+                start_idx = batch_num * batch_size
+                end_idx = min(start_idx + batch_size, total)
+
+                with self.collection.batch.dynamic() as batch:
+                    for recipe in recipes_list[start_idx:end_idx]:
+                        cleaned_recipe = {
+                            'title': str(recipe.get('Title', '')),
+                            'ingredients': str(recipe.get('Ingredients', '')),
+                            'instructions': str(recipe.get('Instructions', ''))
+                        }
+                        # Only add recipe if it has all required fields
+                        if all(cleaned_recipe.values()):
+                            batch.add_object(properties=cleaned_recipe)
+
+                print(f"\rProgress: {((batch_num + 1) / batches * 100):.1f}% ({end_idx}/{total} recipes)", end='',
+                      flush=True)
+
+            print("\nImport completed!")
+            return True
+
+        except Exception as e:
+            print(f"\nError in batch import: {e}")
+            return False
+
     def _initialize_from_huggingface(self):
         try:
             print("Loading data from dataset...")
@@ -79,10 +119,12 @@ class RecipeDB:
                 "hf://datasets/Hieu-Pham/kaggle_food_recipes/Food Ingredients and Recipe Dataset with Image Name Mapping.csv")
             print(f"Loaded {len(df)} records")
 
-            # Clean the data and rename 'id' column if it exists
-            df = df.fillna('')  # Replace NaN with empty string
-            if 'id' in df.columns:
-                df = df.rename(columns={'id': 'recipe_id'})
+            # Clean the data
+            df = df.fillna('')
+
+            # Drop the unnamed index column if it exists
+            if 'Unnamed: 0' in df.columns:
+                df = df.drop('Unnamed: 0', axis=1)
 
             recipes_list = df.to_dict('records')
 
@@ -102,43 +144,9 @@ class RecipeDB:
             traceback.print_exc()
             raise
 
-    def close(self):
-        try:
-            if hasattr(self, 'client'):
-                self.client.close()
-        except Exception as e:
-            print(f"Error closing connection: {e}")
-
-    def batch_import_recipes(self, recipes_list: List[Dict[str, Any]]) -> bool:
-        try:
-            print("Starting batch import...")
-            with self.collection.batch.dynamic() as batch:
-                for recipe in recipes_list:
-                    # Rename 'id' to 'recipe_id' if present
-                    if 'id' in recipe:
-                        recipe['recipe_id'] = recipe.pop('id')
-
-                    cleaned_recipe = {
-                        k: str(v) if v is not None else ''
-                        for k, v in recipe.items()
-                        if
-                        k in ['recipe_id', 'title', 'ingredients', 'instructions', 'image_name', 'cleaned_ingredients']
-                    }
-                    batch.add_object(properties=cleaned_recipe)
-
-            print("Batch import completed")
-            return True
-        except Exception as e:
-            print(f"Error in batch import: {e}")
-            import traceback
-            traceback.print_exc()
-            return False
-
     def search_similar_recipes_by_ingredients(self, ingredients: str, limit: int = 5) -> List[Dict]:
         """Search for recipes based on ingredients."""
         try:
-            print(f"Searching for recipes with ingredients: {ingredients}")
-
             response = self.collection.query.near_text(
                 query=ingredients,
                 limit=limit,
@@ -149,22 +157,18 @@ class RecipeDB:
             if hasattr(response, 'objects'):
                 for obj in response.objects:
                     recipe = {
-                        "recipe_id": obj.properties.get("recipe_id", ""),
-                        "title": obj.properties.get("title", "Untitled Recipe"),
-                        "ingredients": obj.properties.get("ingredients", "No ingredients listed"),
-                        "instructions": obj.properties.get("instructions", "No instructions available"),
+                        "title": obj.properties.get("title", "Untitled"),
+                        "ingredients": obj.properties.get("ingredients", ""),
+                        "instructions": obj.properties.get("instructions", ""),
                         "similarity_score": 1 - getattr(obj.metadata, 'distance', 0)
                     }
                     results.append(recipe)
-                print(f"Found {len(results)} matching recipes")
-            return results
+
+            return sorted(results, key=lambda x: x['similarity_score'], reverse=True)
 
         except Exception as e:
             print(f"Error in recipe search: {e}")
-            import traceback
-            traceback.print_exc()
             return []
-
 
 def get_similar_recipes(ingredients, db=None):
     """Get recipes that match the given ingredients."""
