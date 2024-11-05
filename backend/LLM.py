@@ -64,7 +64,7 @@ def write_recipe(name: str, description: str, ingredients: list[str]=None, cost:
     if allergies is None:
         allergies = ['None']
 
-    with open('BackEnd-Stuff/system_prompt', 'r') as f:
+    with open('../backend/system_prompt', 'r') as f:
         system_prompt = {'role': 'system', 'content': str(f.read())}
 
     user_prompt = {'role': 'user', 'content': f"Recipe Name: {name}; "
@@ -104,7 +104,7 @@ def create_recipe_list(ingredients: list[str]=None, cost: int=0, cuisine: str=No
     if allergies is None:
         allergies = ['None']
 
-    with open('BackEnd-Stuff/system_prompt2', 'r') as f:
+    with open('../backend/system_prompt2', 'r') as f:
         system_prompt = {'role': 'system', 'content': str(f.read())}
 
     # Capture ingredients passed from Flask as a list of strings

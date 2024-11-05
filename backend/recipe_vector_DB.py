@@ -244,7 +244,7 @@ class RecipeDB:
             print(f"\nError in batch import: {e}")
             return False
 
-    def search_similar_recipes_by_ingredients(self, ingredients: str, limit: int = 5) -> List[Dict]:
+    def search_similar_recipes_by_ingredients(self, ingredients: str, limit: int = 3) -> List[Dict]:
         """Search for recipes by matching ingredients."""
         try:
             print(f"Searching for recipes with ingredients similar to: {ingredients}")
@@ -282,7 +282,7 @@ class RecipeDB:
             traceback.print_exc()
             return []
 
-    def search_by_title(self, title: str, limit: int = 5) -> List[Dict]:
+    def search_by_title(self, title: str, limit: int = 3) -> List[Dict]:
         """Search recipes by title."""
         try:
             # For title-focused search
@@ -313,7 +313,7 @@ class RecipeDB:
             traceback.print_exc()
             return []
 
-    def search_by_instructions(self, instruction_text: str, limit: int = 5) -> List[Dict]:
+    def search_by_instructions(self, instruction_text: str, limit: int = 3) -> List[Dict]:
         """Search recipes by cooking instructions."""
         try:
             response = self.collection.query.near_text(
@@ -343,7 +343,7 @@ class RecipeDB:
             traceback.print_exc()
             return []
 
-    def advanced_recipe_search(self, query: str, search_fields: List[str] = None, limit: int = 5) -> List[Dict]:
+    def advanced_recipe_search(self, query: str, search_fields: List[str] = None, limit: int = 3) -> List[Dict]:
         """
         Search recipes with emphasis on specified fields.
         """
@@ -390,10 +390,9 @@ def get_similar_recipes(ingredients, db=None):
     if db is None:
         db = RecipeDB()
 
-    recipes = db.search_similar_recipes_by_ingredients(ingredients, limit=5)
-    return [(recipe['title'],
-             recipe['ingredients'][:200] + "..." if len(recipe['ingredients']) > 200 else recipe['ingredients'])
-            for recipe in recipes]
+    fields = ['ingredients','title','instructions']
+    recipes = db.advanced_recipe_search(ingredients, fields)
+    return recipes
 
 
 if __name__ == '__main__':
