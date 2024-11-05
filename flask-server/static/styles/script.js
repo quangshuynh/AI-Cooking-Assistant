@@ -34,9 +34,18 @@ function filterIngredients() {
         const category = item.parentElement.id;
         const allergens = item.getAttribute('data-allergens') || '';
 
-        const isMeat = ['chicken', 'beef', 'turkey', 'shrimp', 'salmon', 'pork', 'crab', 'lamb', 'bacon', 'ham'].includes(ingredientText);
-        const isAnimalProduct = isMeat || ['eggs', 'milk', 'cheese', 'yogurt', 'butter', 'cream'].includes(ingredientText);
-        
+        const isMeat = [
+            'chicken', 'beef', 'turkey', 'shrimp', 'salmon', 'pork',
+            'crab', 'lamb', 'bacon', 'ham', 'duck', 'venison', 'bison'
+        ].includes(ingredientText);
+
+        const isAnimalProduct = isMeat || [
+            'eggs', 'milk', 'cheese', 'yogurt', 'butter', 'cream',
+            'sour cream', 'ice cream', 'whipped cream', 'cottage cheese',
+            'ghee', 'ricotta', 'feta cheese', 'goat cheese', 'kefir'
+        ].includes(ingredientText);
+
+
         let matchesSearch = ingredientText.includes(searchValue);
 
         if (isVegan && isAnimalProduct) matchesSearch = false;
@@ -78,12 +87,19 @@ function unselectAllIngredients() {
 async function generateRecipe() {
     const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
         .map(item => item.textContent);
+
+    const selectedCuisine = document.getElementById('cuisine').value;
+    const customCuisine = document.getElementById('custom-cuisine').value;
+    const cuisine = selectedCuisine === 'other' ? customCuisine : selectedCuisine;
+
+    const mealType = document.getElementById('meal-type').value; // Capture meal type
+
     const recipeDisplay = document.getElementById('recipe-display');
     const spinner = document.getElementById('loading-spinner');
 
     if (selectedIngredients.length > 0) {
-        recipeDisplay.innerHTML = ''; // 
-        spinner.style.display = 'flex'; 
+        recipeDisplay.innerHTML = '';
+        spinner.style.display = 'flex';
 
         try {
             const response = await fetch("/generate_recipe", {
@@ -91,12 +107,10 @@ async function generateRecipe() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ ingredients: selectedIngredients })
+                body: JSON.stringify({ ingredients: selectedIngredients, cuisine: cuisine, meal_type: mealType })
             });
 
             const result = await response.json();
-
-
             spinner.style.display = 'none';
             recipeDisplay.innerHTML = `<h3>Generated Recipe</h3>${result.recipe_html}`;
         } catch (error) {
@@ -143,3 +157,30 @@ function toggleCustomCuisineInput() {
     }
 }
 
+
+function updateProgressBar(progress) {
+    const progressBar = document.getElementById("progress-bar");
+    progressBar.style.width = progress + "%";
+}
+
+async function fetchProgress() {
+    const eventSource = new EventSource("/progress");
+    eventSource.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        updateProgressBar(data.progress);
+
+        // Stop listening when progress reaches 100%
+        if (data.progress >= 100) {
+            eventSource.close();
+        }
+    };
+}
+
+// Call this function when the recipe generation starts
+function startRecipeGeneration() {
+    // Start fetching progress
+    fetchProgress();
+
+    // Other recipe generation logic...
+    generateRecipe();
+}
