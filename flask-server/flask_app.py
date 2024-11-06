@@ -8,12 +8,16 @@ from backend.recipe_vector_DB import get_similar_recipes
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir), autoescape=True)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+llm_path = os.path.join(current_dir, 'backend', 'LLM.py')
 
 app = Flask(__name__)
+
 
 @app.route("/")
 def home():
     return render_template('index.html')
+
 
 @app.route('/suggest_ingredients')
 def suggest_ingredients():
@@ -26,6 +30,7 @@ def suggest_ingredients():
 
     # Return the suggestions (limiting to 5 if needed)
     return jsonify(similar_ingredients[:5])
+
 
 @app.route('/find_recipes', methods=['POST'])
 def find_recipes():
@@ -63,27 +68,27 @@ def find_recipes():
         print(f"Error in find_recipes: {str(e)}")  # Debug print
         return jsonify({'error': str(e)}), 500
 
+
 @app.route("/generate_recipe", methods=["POST"])
 def generate_recipe():
     data = request.get_json()
-    selected_ingredients = data.get('ingredients', []) #debugging
+    selected_ingredients = data.get('ingredients', [])  # debugging
     print(selected_ingredients)
-    
+
     # run the LLM and capture the formatted HTML output
     recipe_html = run_llm(selected_ingredients)
-    
+
     return jsonify({"recipe_html": recipe_html})
 
 
 def run_llm(ingredients):
     try:
         ingredients_str = "The ingredients are: " + ", ".join(ingredients)
-        result = subprocess.run([sys.executable, '../backend/LLM.py', ingredients_str], capture_output=True, text=True)
-    
+        result = subprocess.run([sys.executable, llm_path, ingredients_str], capture_output=True, text=True)
 
-        if result.returncode != 0: 
+        if result.returncode != 0:
             return f"Error generating recipe: {result.stderr}"
-        
+
         return result.stdout  # return the recipe output
     except Exception as e:
         return f"Exception while generating recipe: {str(e)}"

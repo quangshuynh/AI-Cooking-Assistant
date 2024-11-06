@@ -10,7 +10,7 @@ import atexit
 
 class IngredientsDB:
     def __init__(self, collection_name="Ingredients", schema_path="schema.yaml"):
-        self.client = weaviate.connect_to_local()
+        self.client = weaviate.connect_to_local(host='129.21.42.90')
         self.collection_name = collection_name
         self.schema_path = schema_path
         atexit.register(self.close)
