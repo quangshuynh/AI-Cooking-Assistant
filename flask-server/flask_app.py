@@ -13,9 +13,11 @@ llm_path = os.path.join(current_dir, 'backend', 'LLM.py')
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def home():
     return render_template('index.html')
+
 
 @app.route('/suggest_ingredients')
 def suggest_ingredients():
@@ -28,6 +30,7 @@ def suggest_ingredients():
 
     # Return the suggestions (limiting to 5 if needed)
     return jsonify(similar_ingredients[:5])
+
 
 @app.route('/find_recipes', methods=['POST'])
 def find_recipes():
@@ -65,6 +68,7 @@ def find_recipes():
         print(f"Error in find_recipes: {str(e)}")  # Debug print
         return jsonify({'error': str(e)}), 500
 
+
 @app.route("/generate_recipe", methods=["POST"])
 def generate_recipe():
     data = request.get_json()
@@ -89,9 +93,9 @@ def run_llm(ingredients, cuisine, meal_type):
         result = subprocess.run([sys.executable, llm_path, ingredients_str, cuisine_str, meal_type], capture_output=True, text=True)
     
 
-        if result.returncode != 0: 
+        if result.returncode != 0:
             return f"Error generating recipe: {result.stderr}"
-        
+
         return result.stdout  # return the recipe output
     except Exception as e:
         return f"Exception while generating recipe: {str(e)}"
