@@ -1,15 +1,21 @@
-import ollama
 import ast
 import re
 import sys
+import os
 import time
+import json
 import requests
 
 start_time = time.time()
 
+url = '129.21.42.90'
 default_model = 'dolphin-llama3'
 STEPS = 0
 PROGRESS = 0
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+system_prompt_path = os.path.join(current_dir, 'system_prompt')
+system_prompt2_path = os.path.join(current_dir, 'system_prompt2')
 
 
 def ollama_chat(model: str, messages: list, host: str = "http://192.168.1.100:11434") -> dict:
@@ -29,19 +35,26 @@ def ollama_chat(model: str, messages: list, host: str = "http://192.168.1.100:11
             f"{host}/api/chat",
             json={
                 "model": model,
-                "messages": messages
-            }
+                "messages": messages,
+                "stream": False  # This tells Ollama to return a single response
+            },
+            stream=False
         )
-        response.raise_for_status()  # Raise exception for bad status codes
+        response.raise_for_status()
+
+        # Parse the single JSON response
+        data = response.json()
         return {
             "message": {
-                "content": response.json()["message"]["content"]
+                "content": data["message"]["content"]
             }
         }
     except requests.exceptions.RequestException as e:
         print(f"Error connecting to Ollama: {e}")
-        return {"message": {"content": ""}}  # Return empty content on error
-
+        return {"message": {"content": ""}}
+    except json.JSONDecodeError as e:
+        print(f"Error parsing Ollama response: {e}")
+        return {"message": {"content": ""}}
 
 # Function to extract recipe content from XML-like or formatted content
 def extract_recipe(xml_content, pattern):
@@ -62,13 +75,13 @@ def parse_recipe_list(xml_content):
             recipe_list.append(dict_single)
     except:
         try:
-            dict_strs = extract_recipe(xml_content, r'```python([\s\S]*?)```')
+            dict_strs = extract_recipe(xml_content, r'python([\s\S] * ?)')
             recipe_list = []
             for dict_single in ast.literal_eval(dict_strs):
                 recipe_list.append(dict_single)
         except:
             try:
-                dict_strs = extract_recipe(xml_content, r'```([\s\S]*?)```')
+                dict_strs = extract_recipe(xml_content, r'([\s\S] * ?)')
                 recipe_list = []
                 for dict_single in ast.literal_eval(dict_strs):
                     recipe_list.append(dict_single)
@@ -101,7 +114,7 @@ def write_recipe(name: str, description: str, ingredients: list[str] = None, cos
     if allergies is None:
         allergies = ['None']
 
-    with open('system_prompt', 'r') as f:
+    with open(system_prompt_path, 'r') as f:
         system_prompt = {'role': 'system', 'content': str(f.read())}
 
     user_prompt = {'role': 'user', 'content': f"Recipe Name: {name}; "
@@ -122,7 +135,7 @@ def write_recipe(name: str, description: str, ingredients: list[str] = None, cos
         response = ollama_chat(
             model=default_model,
             messages=[system_prompt, user_prompt],
-            host="http://192.168.1.100:11434"  # Replace with your target IP
+            host=f"http://{url}:11434"  # Replace with your target IP
         )['message']['content']
 
         try:
@@ -144,7 +157,7 @@ def create_recipe_list(ingredients: list[str] = None, cost: int = 0, cuisine: st
     if allergies is None:
         allergies = ['None']
 
-    with open('system_prompt2', 'r') as f:
+    with open(system_prompt2_path, 'r') as f:
         system_prompt = {'role': 'system', 'content': str(f.read())}
 
     # Capture ingredients passed from Flask as a list of strings
@@ -165,7 +178,7 @@ def create_recipe_list(ingredients: list[str] = None, cost: int = 0, cuisine: st
         response = ollama_chat(
             model=default_model,
             messages=[system_prompt, user_prompt],
-            host="http://192.168.1.100:11434"  # Replace with your target IP
+            host=f"http://{url}:11434"  # Replace with your target IP
         )['message']['content']
 
         try:
