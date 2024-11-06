@@ -3,12 +3,44 @@ import ast
 import re
 import sys
 import time
+import requests
 
 start_time = time.time()
 
 default_model = 'dolphin-llama3'
 STEPS = 0
 PROGRESS = 0
+
+
+def ollama_chat(model: str, messages: list, host: str = "http://192.168.1.100:11434") -> dict:
+    """
+    Replacement for ollama.chat that uses requests to connect to a remote Ollama instance
+
+    Args:
+        model (str): Name of the model to use
+        messages (list): List of message dictionaries with 'role' and 'content'
+        host (str): Host URL of the Ollama instance
+
+    Returns:
+        dict: Response dictionary with the same structure as ollama.chat
+    """
+    try:
+        response = requests.post(
+            f"{host}/api/chat",
+            json={
+                "model": model,
+                "messages": messages
+            }
+        )
+        response.raise_for_status()  # Raise exception for bad status codes
+        return {
+            "message": {
+                "content": response.json()["message"]["content"]
+            }
+        }
+    except requests.exceptions.RequestException as e:
+        print(f"Error connecting to Ollama: {e}")
+        return {"message": {"content": ""}}  # Return empty content on error
 
 # Function to extract recipe content from XML-like or formatted content
 def extract_recipe(xml_content, pattern):
@@ -82,9 +114,10 @@ def write_recipe(name: str, description: str, ingredients: list[str]=None, cost:
         count += 1
         global STEPS
         STEPS += 1
-        response = ollama.chat(
+        response = ollama_chat(
             model=default_model,
             messages=[system_prompt, user_prompt],
+            host="http://192.168.1.100:11434"  # Replace with your target IP
         )['message']['content']
 
         try:
@@ -122,9 +155,10 @@ def create_recipe_list(ingredients: list[str]=None, cost: int=0, cuisine: str=No
         global STEPS
         STEPS += 1
 
-        response = ollama.chat(
+        response = ollama_chat(
             model=default_model,
             messages=[system_prompt, user_prompt],
+            host="http://192.168.1.100:11434"  # Replace with your target IP
         )['message']['content']
 
         try:
