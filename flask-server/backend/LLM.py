@@ -42,6 +42,7 @@ def ollama_chat(model: str, messages: list, host: str = "http://192.168.1.100:11
         print(f"Error connecting to Ollama: {e}")
         return {"message": {"content": ""}}  # Return empty content on error
 
+
 # Function to extract recipe content from XML-like or formatted content
 def extract_recipe(xml_content, pattern):
     match = re.search(pattern, xml_content, re.DOTALL)
@@ -50,6 +51,7 @@ def extract_recipe(xml_content, pattern):
     found_str = match.group(1)
     found_result = re.sub(r'\s+', ' ', found_str).strip()
     return found_result
+
 
 # Function to parse a list of recipes from content
 def parse_recipe_list(xml_content):
@@ -80,6 +82,7 @@ def parse_recipe_list(xml_content):
                     return None
     return recipe_list
 
+
 # Optional: Convert the extracted content into an actual dictionary
 def parse_recipe_dict(xml_content):
     dict_str = extract_recipe(xml_content, r'<final_output>\s*({[\s\S]*?})\s*</final_output>')
@@ -90,9 +93,11 @@ def parse_recipe_dict(xml_content):
             return None
     return None
 
+
 # Function to create a recipe dictionary
-def write_recipe(name: str, description: str, ingredients: list[str]=None, cost: int=0, cuisine: str=None, serving_size: int=0, meal_type: str=None,
-                 allergies=None, diet: str=None) -> dict[str, str]:
+def write_recipe(name: str, description: str, ingredients: list[str] = None, cost: int = 0, cuisine: str = None,
+                 serving_size: int = 0, meal_type: str = None,
+                 allergies=None, diet: str = None) -> dict[str, str]:
     if allergies is None:
         allergies = ['None']
 
@@ -131,9 +136,11 @@ def write_recipe(name: str, description: str, ingredients: list[str]=None, cost:
 
     return False
 
+
 # Function to create a list of recipes
-def create_recipe_list(ingredients: list[str]=None, cost: int=0, cuisine: str=None, serving_size: int=0, meal_type: str=None,
-                       allergies=None, diet: str=None) -> list[dict[str, str]]:
+def create_recipe_list(ingredients: list[str] = None, cost: int = 0, cuisine: str = None, serving_size: int = 0,
+                       meal_type: str = None,
+                       allergies=None, diet: str = None) -> list[dict[str, str]]:
     if allergies is None:
         allergies = ['None']
 
@@ -174,11 +181,12 @@ def create_recipe_list(ingredients: list[str]=None, cost: int=0, cuisine: str=No
 
     return []
 
+
 if __name__ == "__main__":
     ingredients = sys.argv[1:] if len(sys.argv) > 1 else []
 
     recipes_list = create_recipe_list(ingredients=ingredients)
-    
+
     recipes = []
     for recipe in recipes_list:
         recipes.append(write_recipe(*recipe.values()))
@@ -191,10 +199,10 @@ if __name__ == "__main__":
 
         formatted_recipe = f"""
         <div class="recipe-container">
-            <div class="recipe-header" onclick="toggleRecipeDetails('recipe-{index+1}')">
+            <div class="recipe-header" onclick="toggleRecipeDetails('recipe-{index + 1}')">
                 <h3>Recipe {index + 1}: {recipe_name}</h3>
             </div>
-            <div class="recipe-content" id="recipe-{index+1}">
+            <div class="recipe-content" id="recipe-{index + 1}">
                 <p><strong>Description:</strong> {recipe_description}</p>
                 <p><strong>Ingredients:</strong></p>
                 <ul>
