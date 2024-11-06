@@ -1,4 +1,4 @@
-// Define categories at the top level
+// Global variables
 const categories = {
     "protein-list": false,
     "dairy-list": false,
@@ -8,6 +8,37 @@ const categories = {
     "misc-list": false
 };
 
+let searchTimeout;
+const searchBox = document.getElementById('ingredient-search');
+const searchSuggestionsContainer = document.createElement('div');
+searchSuggestionsContainer.className = 'search-suggestions';
+searchBox.parentNode.style.position = 'relative';
+searchBox.parentNode.appendChild(searchSuggestionsContainer);
+
+// Core ingredient selection functions
+function selectIngredient(ingredient) {
+    if (!ingredient || ingredient.classList.contains('disabled')) return;
+
+    ingredient.classList.add('selected');
+    const categoryList = ingredient.parentElement;
+    if (categoryList) {
+        categoryList.style.display = 'flex';
+    }
+    updateSelectedIngredientsDisplay();
+}
+
+function deselectIngredient(ingredient) {
+    if (!ingredient) return;
+    ingredient.classList.remove('selected');
+    updateSelectedIngredientsDisplay();
+}
+
+function findIngredientElement(ingredientName) {
+    return Array.from(document.querySelectorAll('.ingredient-item'))
+        .find(item => item.textContent.toLowerCase() === ingredientName.toLowerCase());
+}
+
+// Category management
 function toggleCategory(categoryId, show = null) {
     const categoryList = document.getElementById(categoryId);
     if (!categoryList) return;
@@ -21,67 +52,104 @@ function toggleCategory(categoryId, show = null) {
     }
 }
 
-function filterIngredients() {
-    const searchValue = document.getElementById('ingredient-search').value.toLowerCase();
-    const ingredients = document.querySelectorAll('.ingredient-item');
+function showAllCategories() {
+    Object.keys(categories).forEach(categoryId => {
+        const category = document.getElementById(categoryId);
+        if (category) {
+            category.style.display = 'flex';
+        }
+    });
+}
 
-    const selectedAllergies = Array.from(document.querySelectorAll('.allergy-checkbox:checked')).map(checkbox => checkbox.value);
+// Filtering system
+function filterIngredients() {
+    const searchValue = searchBox.value.toLowerCase();
+    const selectedAllergies = Array.from(document.querySelectorAll('.allergy-checkbox:checked'))
+        .map(checkbox => checkbox.value);
     const isVegetarian = document.getElementById('vegetarian-filter')?.checked;
     const isVegan = document.getElementById('vegan-filter')?.checked;
 
-    ingredients.forEach(item => {
+    const visibleCategories = new Set();
+
+    document.querySelectorAll('.ingredient-item').forEach(item => {
         const ingredientText = item.textContent.toLowerCase();
-        const category = item.parentElement.id;
+        const category = item.parentElement;
         const allergens = item.getAttribute('data-allergens') || '';
 
-        const isMeat = [
-            'chicken', 'beef', 'turkey', 'shrimp', 'salmon', 'pork',
-            'crab', 'lamb', 'bacon', 'ham', 'duck', 'venison', 'bison'
-        ].includes(ingredientText);
+        const isMeat = ['chicken', 'beef', 'turkey', 'shrimp', 'salmon', 'pork',
+            'crab', 'lamb', 'bacon', 'ham', 'duck', 'venison', 'bison'].includes(ingredientText);
 
-        const isAnimalProduct = isMeat || [
-            'eggs', 'milk', 'cheese', 'yogurt', 'butter', 'cream',
-            'sour cream', 'ice cream', 'whipped cream', 'cottage cheese',
-            'ghee', 'ricotta', 'feta cheese', 'goat cheese', 'kefir'
-        ].includes(ingredientText);
+        const isAnimalProduct = isMeat || ['eggs', 'milk', 'cheese', 'yogurt', 'butter', 'cream',
+            'sour cream', 'ice cream', 'whipped cream', 'cottage cheese', 'ghee', 'ricotta',
+            'feta cheese', 'goat cheese', 'kefir'].includes(ingredientText);
 
-        let matchesSearch = ingredientText.includes(searchValue);
+        const matchesSearch = ingredientText.includes(searchValue);
+        const hasAllergen = selectedAllergies.some(allergy => allergens.includes(allergy));
+        const isFiltered = (isVegan && isAnimalProduct) || (isVegetarian && isMeat) || hasAllergen || !matchesSearch;
 
-        if (isVegan && isAnimalProduct) matchesSearch = false;
-        else if (isVegetarian && isMeat) matchesSearch = false;
-
-        const isAllergen = selectedAllergies.some(allergy => allergens.includes(allergy));
-
-        if (isAllergen || !matchesSearch) {
+        if (isFiltered) {
             item.classList.add('disabled');
-            item.classList.remove('selected');
+            if (!item.classList.contains('selected')) {
+                item.style.display = 'none';
+            }
         } else {
             item.classList.remove('disabled');
             item.style.display = 'block';
-            categories[category] = true;
+            if (category) {
+                visibleCategories.add(category.id);
+            }
         }
     });
 
-    updateCategoryVisibility();
+    // Show only categories with visible ingredients
+    Object.keys(categories).forEach(categoryId => {
+        toggleCategory(categoryId, visibleCategories.has(categoryId));
+    });
 }
 
-// Set up search suggestions
-let searchTimeout;
-const searchSuggestionsContainer = document.createElement('div');
-searchSuggestionsContainer.className = 'search-suggestions';
-const searchBox = document.getElementById('ingredient-search');
-searchBox.parentNode.style.position = 'relative';
-searchBox.parentNode.appendChild(searchSuggestionsContainer);
-
-function updateCategoryVisibility() {
+function handleSuggestionClick(suggestion) {
+    // Show all categories temporarily to ensure we can find the ingredient
     Object.keys(categories).forEach(categoryId => {
-        const categoryList = document.getElementById(categoryId);
-        if (categoryList) {
-            const hasSelectedOrVisible = Array.from(categoryList.querySelectorAll('.ingredient-item'))
-                .some(item => !item.classList.contains('disabled') || item.classList.contains('selected'));
-            toggleCategory(categoryId, hasSelectedOrVisible);
+        const category = document.getElementById(categoryId);
+        if (category) {
+            category.style.display = 'flex';
+            category.querySelectorAll('.ingredient-item').forEach(item => {
+                item.style.display = 'block';
+            });
         }
     });
+
+    // Find the ingredient
+    let found = false;
+    document.querySelectorAll('.ingredient-item').forEach(item => {
+        if (item.textContent.toLowerCase() === suggestion.toLowerCase()) {
+            found = true;
+            if (!item.classList.contains('disabled')) {
+                // Select the ingredient
+                item.classList.add('selected');
+
+                // Make sure its category is visible
+                const categoryList = item.parentElement;
+                if (categoryList) {
+                    categoryList.style.display = 'flex';
+                }
+
+                // Scroll to the ingredient
+                item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Update the display
+                updateSelectedIngredientsDisplay();
+            }
+        }
+    });
+
+    // Hide suggestions
+    searchSuggestionsContainer.style.display = 'none';
+
+    // Reapply filters
+    filterIngredients();
+
+    return found;
 }
 
 async function handleIngredientSearch(event) {
@@ -98,16 +166,10 @@ async function handleIngredientSearch(event) {
 
     searchTimeout = setTimeout(async () => {
         try {
-            const response = await fetch(`/suggest_ingredients?query=${encodeURIComponent(searchValue)}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
+            const response = await fetch(`/suggest_ingredients?query=${encodeURIComponent(searchValue)}`);
             if (!response.ok) throw new Error('Network response was not ok');
-            const suggestions = await response.json();
 
+            const suggestions = await response.json();
             searchSuggestionsContainer.innerHTML = '';
 
             if (suggestions.length > 0) {
@@ -117,34 +179,7 @@ async function handleIngredientSearch(event) {
                     suggestionElement.textContent = suggestion;
 
                     suggestionElement.addEventListener('click', () => {
-                        let foundIngredient = false;
-
-                        // Show all categories temporarily
-                        Object.keys(categories).forEach(categoryId => {
-                            toggleCategory(categoryId, true);
-                        });
-
-                        document.querySelectorAll('.ingredient-item').forEach(item => {
-                            if (item.textContent.toLowerCase() === suggestion.toLowerCase()) {
-                                foundIngredient = true;
-                                if (!item.classList.contains('disabled')) {
-                                    item.classList.add('selected');
-                                    const categoryList = item.parentElement;
-                                    if (categoryList) {
-                                        toggleCategory(categoryList.id, true);
-                                    }
-                                    updateSelectedIngredientsDisplay();
-                                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                }
-                            }
-                        });
-
-                        searchSuggestionsContainer.style.display = 'none';
-                        if (!foundIngredient) {
-                            console.log('Ingredient not found:', suggestion);
-                        }
-
-                        updateCategoryVisibility();
+                        handleSuggestionClick(suggestion);
                     });
 
                     searchSuggestionsContainer.appendChild(suggestionElement);
@@ -160,16 +195,10 @@ async function handleIngredientSearch(event) {
     }, 300);
 }
 
-// Event Listeners
+// Event listeners
 searchBox.addEventListener('input', (event) => {
     filterIngredients();
     handleIngredientSearch(event);
-});
-
-searchBox.addEventListener('focus', () => {
-    if (searchBox.value.trim()) {
-        handleIngredientSearch({ target: searchBox });
-    }
 });
 
 document.addEventListener('click', (event) => {
@@ -178,56 +207,35 @@ document.addEventListener('click', (event) => {
     }
 });
 
-// Add keyboard navigation for suggestions
-searchBox.addEventListener('keydown', (event) => {
-    const suggestions = searchSuggestionsContainer.querySelectorAll('.suggestion-item');
-    const currentIndex = Array.from(suggestions).findIndex(el => el.classList.contains('highlighted'));
-
-    switch(event.key) {
-        case 'ArrowDown':
-            event.preventDefault();
-            if (currentIndex < suggestions.length - 1) {
-                suggestions[currentIndex]?.classList.remove('highlighted');
-                suggestions[currentIndex + 1].classList.add('highlighted');
-            } else if (currentIndex === -1 && suggestions.length > 0) {
-                suggestions[0].classList.add('highlighted');
-            }
-            break;
-
-        case 'ArrowUp':
-            event.preventDefault();
-            if (currentIndex > 0) {
-                suggestions[currentIndex].classList.remove('highlighted');
-                suggestions[currentIndex - 1].classList.add('highlighted');
-            }
-            break;
-
-        case 'Enter':
-            const highlighted = searchSuggestionsContainer.querySelector('.suggestion-item.highlighted');
-            if (highlighted) {
-                event.preventDefault();
-                highlighted.click();
-            }
-            break;
-    }
-});
-
 // Add click handlers to all ingredient items
-const ingredients = document.querySelectorAll('.ingredient-item');
-ingredients.forEach(item => {
+document.querySelectorAll('.ingredient-item').forEach(item => {
     item.addEventListener('click', () => {
         if (!item.classList.contains('disabled')) {
-            item.classList.toggle('selected');
-            updateSelectedIngredientsDisplay();
+            if (item.classList.contains('selected')) {
+                deselectIngredient(item);
+            } else {
+                selectIngredient(item);
+            }
         }
     });
 });
 
+function updateSelectedIngredientsDisplay() {
+    const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
+        .map(item => item.textContent);
+    const selectedIngredientsDisplay = document.getElementById('selected-ingredients-display');
+
+    if (selectedIngredients.length > 0) {
+        selectedIngredientsDisplay.innerHTML = `<p>${selectedIngredients.join(', ')}</p>`;
+    } else {
+        selectedIngredientsDisplay.innerHTML = `<p>No ingredients selected.</p>`;
+    }
+}
+
 function unselectAllIngredients() {
-    ingredients.forEach(item => {
-        item.classList.remove('selected');
+    document.querySelectorAll('.ingredient-item.selected').forEach(item => {
+        deselectIngredient(item);
     });
-    updateSelectedIngredientsDisplay();
 }
 
 async function generateRecipe() {
@@ -243,113 +251,94 @@ async function generateRecipe() {
     const recipeDisplay = document.getElementById('recipe-display');
     const spinner = document.getElementById('loading-spinner');
 
-    if (selectedIngredients.length > 0) {
-        recipeDisplay.innerHTML = '';
-        spinner.style.display = 'flex';
-
-        try {
-            let endpoint, requestData;
-
-            if (recipeMode === 'find') {
-                endpoint = "/find_recipes";
-                requestData = {
-                    query: `${selectedIngredients.join(', ')}, ${cuisine}, ${mealType}`
-                };
-            } else {
-                endpoint = "/generate_recipe";
-                requestData = {
-                    ingredients: selectedIngredients,
-                    cuisine: cuisine,
-                    meal_type: mealType
-                };
-            }
-
-            console.log('Sending request to:', endpoint);
-            console.log('Request data:', requestData);
-
-            const response = await fetch(endpoint, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(requestData)
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Server response:', errorText);
-                throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
-            }
-
-            const contentType = response.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                const text = await response.text();
-                console.error('Received non-JSON response:', text);
-                throw new Error("Received non-JSON response from server");
-            }
-
-            const result = await response.json();
-            console.log('Received result:', result);
-
-            spinner.style.display = 'none';
-
-            if (recipeMode === 'find') {
-                // Display multiple recipes
-                let recipesHtml = '<h3>Found Recipes</h3>';
-                if (Array.isArray(result.recipes)) {
-                    result.recipes.forEach((recipe, index) => {
-                        recipesHtml += `
-                            <div class="recipe-card">
-                                <h4>${recipe.title || 'Untitled Recipe'}</h4>
-                                <h5>Ingredients:</h5>
-                                <p>${recipe.ingredients || 'No ingredients listed'}</p>
-                                <h5>Instructions:</h5>
-                                <p>${recipe.instructions || 'No instructions available'}</p>
-                            </div>
-                        `;
-                    });
-                } else {
-                    recipesHtml += '<p>No recipes found</p>';
-                }
-                recipeDisplay.innerHTML = recipesHtml;
-            } else {
-                // Display generated recipe
-                recipeDisplay.innerHTML = `<h3>Generated Recipe</h3>${result.recipe_html}`;
-            }
-        } catch (error) {
-            console.error('Full error:', error);
-            spinner.style.display = 'none';
-            recipeDisplay.innerHTML = `<p>Error ${recipeMode === 'find' ? 'finding' : 'generating'} recipe: ${error.message}</p>`;
-        }
-    } else {
+    if (selectedIngredients.length === 0) {
         recipeDisplay.innerHTML = `<p>Please select at least one ingredient to ${recipeMode === 'find' ? 'find' : 'generate'} a recipe.</p>`;
+        return;
+    }
+
+    recipeDisplay.innerHTML = '';
+    spinner.style.display = 'flex';
+
+    try {
+        const endpoint = recipeMode === 'find' ? '/find_recipes' : '/generate_recipe';
+        const requestData = recipeMode === 'find'
+            ? { query: `${selectedIngredients.join(', ')}, ${cuisine}, ${mealType}` }
+            : { ingredients: selectedIngredients, cuisine: cuisine, meal_type: mealType };
+
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestData)
+        });
+
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const result = await response.json();
+
+        spinner.style.display = 'none';
+
+        if (recipeMode === 'find') {
+            let recipesHtml = '<h3>Found Recipes</h3>';
+            if (Array.isArray(result.recipes) && result.recipes.length > 0) {
+                result.recipes.forEach((recipe, index) => {
+                    // Split instructions into an array and clean up any empty lines
+                    const instructionsArray = recipe.instructions
+                        .split(/[.!?]\s+/)
+                        .filter(instruction => instruction.trim().length > 0)
+                        .map(instruction => instruction.trim());
+
+                    // Split ingredients into an array and clean up
+                    const ingredientsArray = recipe.ingredients
+                        .split(',')
+                        .map(ingredient => ingredient.trim())
+                        .filter(ingredient => ingredient.length > 0);
+
+                    recipesHtml += `
+                        <div class="recipe-container">
+                            <div class="recipe-header" onclick="toggleRecipeDetails('recipe-${index}')">
+                                ${recipe.title || 'Untitled Recipe'}
+                            </div>
+                            <div class="recipe-content" id="recipe-${index}" style="display: none;">
+                                <h4>Ingredients:</h4>
+                                <ul>
+                                    ${ingredientsArray.map(ingredient => `<li>${ingredient}</li>`).join('')}
+                                </ul>
+                                <h4>Instructions:</h4>
+                                <ol>
+                                    ${instructionsArray.map(instruction => `<li>${instruction}</li>`).join('')}
+                                </ol>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                recipesHtml += '<p>No recipes found</p>';
+            }
+            recipeDisplay.innerHTML = recipesHtml;
+        } else {
+            recipeDisplay.innerHTML = `<h3>Generated Recipe</h3>${result.recipe_html}`;
+        }
+    } catch (error) {
+        spinner.style.display = 'none';
+        recipeDisplay.innerHTML = `<p>Error ${recipeMode === 'find' ? 'finding' : 'generating'} recipe: ${error.message}</p>`;
     }
 }
 
-function updateSelectedIngredientsDisplay() {
-    const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
-        .map(item => item.textContent);
-    const selectedIngredientsDisplay = document.getElementById('selected-ingredients-display');
-
-    if (selectedIngredients.length > 0) {
-        selectedIngredientsDisplay.innerHTML = `<p>${selectedIngredients.join(', ')}</p>`;
-    } else {
-        selectedIngredientsDisplay.innerHTML = `<p>No ingredients selected.</p>`;
+// Add this function if it's not already in your code
+function toggleRecipeDetails(recipeId) {
+    const recipeContent = document.getElementById(recipeId);
+    if (recipeContent) {
+        const currentDisplay = recipeContent.style.display;
+        recipeContent.style.display = currentDisplay === 'none' ? 'block' : 'none';
     }
 }
 
 function toggleCustomCuisineInput() {
-    const cuisineSelect = document.getElementById('cuisine');
     const customCuisineInput = document.getElementById('custom-cuisine');
-    if (cuisineSelect.value === 'other') {
-        customCuisineInput.style.display = 'block';
-        customCuisineInput.style.opacity = '1';
-    } else {
-        customCuisineInput.style.display = 'none';
-        customCuisineInput.style.opacity = '0';
-    }
+    customCuisineInput.style.display = document.getElementById('cuisine').value === 'other' ? 'block' : 'none';
+    customCuisineInput.style.opacity = document.getElementById('cuisine').value === 'other' ? '1' : '0';
 }
 
+// Progress tracking
 function updateProgressBar(progress) {
     const progressBar = document.getElementById("progress-bar");
     if (progressBar) {
@@ -362,7 +351,6 @@ async function fetchProgress() {
     eventSource.onmessage = function(event) {
         const data = JSON.parse(event.data);
         updateProgressBar(data.progress);
-
         if (data.progress >= 100) {
             eventSource.close();
         }
