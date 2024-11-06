@@ -8,6 +8,8 @@ from backend.recipe_vector_DB import get_similar_recipes
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir), autoescape=True)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+llm_path = os.path.join(current_dir, 'backend', 'LLM.py')
 
 app = Flask(__name__)
 
@@ -66,19 +68,25 @@ def find_recipes():
 @app.route("/generate_recipe", methods=["POST"])
 def generate_recipe():
     data = request.get_json()
-    selected_ingredients = data.get('ingredients', []) #debugging
-    print(selected_ingredients)
+    selected_ingredients = data.get('ingredients', []) 
+    cuisine = data.get("cuisine", "")
+    meal_type = data.get("meal_type", "")
+    print("Ingredients: " + str(selected_ingredients))
+    print("Cuisine: " + str(cuisine))
+    print("Meal type: " + str(meal_type))
     
     # run the LLM and capture the formatted HTML output
-    recipe_html = run_llm(selected_ingredients)
+    recipe_html = run_llm(selected_ingredients, cuisine, meal_type)
     
     return jsonify({"recipe_html": recipe_html})
 
 
-def run_llm(ingredients):
+def run_llm(ingredients, cuisine, meal_type):
     try:
         ingredients_str = "The ingredients are: " + ", ".join(ingredients)
-        result = subprocess.run([sys.executable, '../backend/LLM.py', ingredients_str], capture_output=True, text=True)
+        cuisine_str = "The cuisine is: " + ", ".join(cuisine)
+        meal_type = "The meal time (for example: breakfast, lunch, dinner) is:" + ", ".join(meal_type)
+        result = subprocess.run([sys.executable, llm_path, ingredients_str, cuisine_str, meal_type], capture_output=True, text=True)
     
 
         if result.returncode != 0: 

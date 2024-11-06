@@ -241,12 +241,13 @@ function unselectAllIngredients() {
 async function generateRecipe() {
     const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
         .map(item => item.textContent);
-
+a
     const selectedCuisine = document.getElementById('cuisine').value;
     const customCuisine = document.getElementById('custom-cuisine').value;
     const cuisine = selectedCuisine === 'other' ? customCuisine : selectedCuisine;
     const mealType = document.getElementById('meal-type').value;
     const recipeMode = document.getElementById('recipe-mode').value;
+    
 
     const recipeDisplay = document.getElementById('recipe-display');
     const spinner = document.getElementById('loading-spinner');
