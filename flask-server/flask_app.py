@@ -88,8 +88,14 @@ def generate_recipe():
 def run_llm(ingredients, cuisine, meal_type):
     try:
         ingredients_str = "The ingredients are: " + ", ".join(ingredients)
-        cuisine_str = "The cuisine is: " + "".join(cuisine)
-        meal_type_str = "The meal time (for example: breakfast, lunch, dinner) is:" + "".join(meal_type)
+        if cuisine and isinstance(cuisine, str):
+            cuisine_str = "The cuisine is: " + "".join(cuisine)
+        else:
+            cuisine_str = ""
+        if meal_type_str and isinstance(meal_type_str, str):
+            meal_type_str = "The meal time (for example: breakfast, lunch, dinner) is:" + "".join(meal_type)
+        else:
+            meal_type_str = " "
         combined = ingredients_str + " and " + cuisine_str + " and " + meal_type_str
         print(combined)
         result = subprocess.run([sys.executable, llm_path, combined], capture_output=True, text=True)
