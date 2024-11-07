@@ -8,6 +8,8 @@ from backend.recipe_vector_DB import get_similar_recipes
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir), autoescape=True)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+llm_path = os.path.join(current_dir, 'backend', 'LLM.py')
 
 app = Flask(__name__)
 
@@ -67,7 +69,7 @@ def find_recipes():
 def generate_recipe():
     data = request.get_json()
     selected_ingredients = data.get('ingredients', []) #debugging
-    print(selected_ingredients)
+    print("Ingredients: " + selected_ingredients)
     
     # run the LLM and capture the formatted HTML output
     recipe_html = run_llm(selected_ingredients)
@@ -78,7 +80,7 @@ def generate_recipe():
 def run_llm(ingredients):
     try:
         ingredients_str = "The ingredients are: " + ", ".join(ingredients)
-        result = subprocess.run([sys.executable, '../backend/LLM.py', ingredients_str], capture_output=True, text=True)
+        result = subprocess.run([sys.executable, llm_path, ingredients_str], capture_output=True, text=True)
     
 
         if result.returncode != 0: 
