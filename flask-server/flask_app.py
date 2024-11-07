@@ -68,19 +68,33 @@ def find_recipes():
 @app.route("/generate_recipe", methods=["POST"])
 def generate_recipe():
     data = request.get_json()
-    selected_ingredients = data.get('ingredients', []) #debugging
-    print("Ingredients: " + selected_ingredients)
+    selected_ingredients = data.get('ingredients', []) 
+    cuisine = data.get("cuisine", "")
+    meal_type = data.get("meal_type", "")
+    print("Ingredients: " + str(selected_ingredients))
+    print("Cuisine: " + str(cuisine))
+    print("Meal type: " + str(meal_type))
     
     # run the LLM and capture the formatted HTML output
-    recipe_html = run_llm(selected_ingredients)
+    recipe_html = run_llm(selected_ingredients, cuisine, meal_type)
     
     return jsonify({"recipe_html": recipe_html})
 
 
-def run_llm(ingredients):
+def run_llm(ingredients, cuisine, meal_type):
     try:
         ingredients_str = "The ingredients are: " + ", ".join(ingredients)
-        result = subprocess.run([sys.executable, llm_path, ingredients_str], capture_output=True, text=True)
+        if cuisine and isinstance(cuisine, str):
+            cuisine_str = "The cuisine is: " + "".join(cuisine)
+        else:
+            cuisine_str = ""
+        if meal_type_str and isinstance(meal_type_str, str):
+            meal_type_str = "The meal time (for example: breakfast, lunch, dinner) is:" + "".join(meal_type)
+        else:
+            meal_type_str = " "
+        combined = ingredients_str + " and " + cuisine_str + " and " + meal_type_str
+        print(combined)
+        result = subprocess.run([sys.executable, llm_path, combined], capture_output=True, text=True)
     
 
         if result.returncode != 0: 
