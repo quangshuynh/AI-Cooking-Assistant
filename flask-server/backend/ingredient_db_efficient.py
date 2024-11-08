@@ -6,35 +6,105 @@ import pandas as pd
 import yaml
 from typing import Dict, List, Any
 import atexit
+import os
+import pickle
+
+import os.path
 
 
 class IngredientsDB:
-    def __init__(self, collection_name="Ingredients", schema_path="schema.yaml"):
-        self.client = weaviate.connect_to_local()
+    def __init__(self, collection_name="RecipeIngredients", schema_path="schema.yaml",
+                 cache_file="encoded_ingredients.pkl", csv_file="04_Recipe-Ingredients_Aliases.csv",
+                 base_dir=None, force_recreate=False):
+        # Set base directory for file operations
+        self.base_dir = base_dir if base_dir else os.getcwd()
+        self.client = weaviate.connect_to_local(host='129.21.42.90')
         self.collection_name = collection_name
         self.schema_path = schema_path
+        self.cache_file = cache_file
+        self.csv_file = csv_file
         atexit.register(self.close)
 
+        # Convert all file paths to absolute paths
+        self.cache_file = os.path.abspath(os.path.join(self.base_dir, cache_file))
+        self.csv_file = os.path.abspath(os.path.join(self.base_dir, csv_file))
+        self.schema_path = os.path.abspath(os.path.join(self.base_dir, schema_path))
+
+        # Connect to Weaviate
+        self.client = weaviate.connect_to_local(host='129.21.42.90')
+        self.collection_name = collection_name
+
+        # If force_recreate is True, delete the existing collection
+        if force_recreate:
+            self.delete_collection()
+
+        # Check existing collections
+        existing_collections = self.client.collections.list_all()
+        print(f"Existing collections: {existing_collections}")
+
         try:
-            # Try to get the existing collection first
-            self.collection = self.client.collections.get(self.collection_name)
-            print(f"Connected to existing collection: {self.collection_name}")
-        except weaviate.exceptions.UnexpectedStatusCodeError:
-            # If collection doesn't exist, create it
-            print(f"Creating new collection: {self.collection_name}")
-            self._create_collection_from_schema()
-            self._initialize_from_huggingface()
+            if self.collection_name in existing_collections:
+                self.collection = self.client.collections.get(self.collection_name)
+                print(f"Connected to existing collection: {self.collection_name}")
+                try:
+                    # Check if collection is empty
+                    count = self.collection.aggregate.over_all(total_count=True).total_count
+                    if count == 0:
+                        print("Collection is empty, initializing data...")
+                        self._initialize_data()
+                except Exception as e:
+                    print(f"Error checking collection count: {e}")
+                    print("Proceeding with initialization...")
+                    self._initialize_data()
+            else:
+                print(f"Creating new collection: {self.collection_name}")
+                self._create_collection_from_schema()
+                self._initialize_data()
+
+        except Exception as e:
+            print(f"Error checking collection count: {e}")
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+    def _preprocess_ingredients(self, df: pd.DataFrame) -> List[str]:
+        """Preprocess ingredients from the Aliased Ingredient Name column."""
+
+        # Process each description
+        ingredients = df['Aliased Ingredient Name'].dropna()
+        processed_ingredients = [ing.strip().title() for ing in ingredients]
+
+        # Remove duplicates using set
+        unique_ingredients = list(set(processed_ingredients))
+        return unique_ingredients
+
+    def delete_collection(self):
+        """Delete the collection if it exists."""
+        try:
+            if self.collection_name in self.client.collections.list_all():
+                self.client.collections.delete(self.collection_name)
+                print(f"Deleted existing collection: {self.collection_name}")
+        except Exception as e:
+            print(f"Error deleting collection: {e}")
 
     def _create_collection_from_schema(self):
+        """Create the Weaviate collection using schema."""
         try:
             with open(self.schema_path, 'r') as file:
                 schema = yaml.safe_load(file)
 
             properties = [
                 wvcc.Property(
-                    name=prop['name'],
+                    name='ingredient',
                     data_type=wvcc.DataType.TEXT
-                ) for prop in schema['properties']
+                ),
+                wvcc.Property(
+                    name='original_text',
+                    data_type=wvcc.DataType.TEXT
+                )
             ]
 
             self.collection = self.client.collections.create(
@@ -43,76 +113,55 @@ class IngredientsDB:
                 properties=properties
             )
         except weaviate.exceptions.UnexpectedStatusCodeError as e:
-            # If collection was created in the meantime, try to get it
             if "already exists" in str(e):
                 self.collection = self.client.collections.get(self.collection_name)
             else:
                 raise
 
-    def _initialize_from_huggingface(self):
-        try:
-            print("Loading data from HuggingFace...")
-            df = pd.read_parquet(
-                "hf://datasets/foodvisor-nyu/labeled-food-ingredients/data/train-00000-of-00001.parquet")
-            print(f"Loaded {len(df)} records from HuggingFace")
+    def _initialize_data(self):
+        """Initialize the database with data, using cache if available."""
+        if os.path.exists(self.cache_file):
+            print("Loading encoded data from cache...")
+            with open(self.cache_file, 'rb') as f:
+                encoded_data = pickle.load(f)
+        else:
+            print("Processing and encoding new data...")
+            # Read and preprocess CSV
+            df = pd.read_csv(self.csv_file)
+            ingredients = self._preprocess_ingredients(df)
 
-            ingredients_list = df.to_dict('records')
-            success = self.batch_import_ingredients(ingredients_list)
-            if success:
-                print(f"Successfully imported {len(ingredients_list)} ingredients")
-            else:
-                print("Failed to import ingredients")
-        except Exception as e:
-            print(f"Error loading data from HuggingFace: {e}")
-            raise
+            # Create data objects
+            encoded_data = [
+                {
+                    'ingredient': ingredient,
+                    'original_text': ingredient  # You might want to store original text too
+                }
+                for ingredient in ingredients
+            ]
+
+            # Cache the encoded data
+            with open(self.cache_file, 'wb') as f:
+                pickle.dump(encoded_data, f)
+
+        # Import the data to Weaviate
+        self.batch_import_ingredients(encoded_data)
 
     def batch_import_ingredients(self, ingredients_list: List[Dict[str, Any]]) -> bool:
+        """Import a batch of ingredients into the database."""
         try:
             with self.collection.batch.dynamic() as batch:
                 for ingredient in ingredients_list:
-                    cleaned_ingredient = {
-                        k: '' if pd.isna(v) else str(v)
-                        for k, v in ingredient.items()
-                        if k in ['ingredient', 'class', 'reason', 'int_label', 'prompt']
-                    }
-                    batch.add_object(properties=cleaned_ingredient)
+                    batch.add_object(properties=ingredient)
             return True
         except Exception as e:
             print(f"Error in batch import: {e}")
             return False
 
-    def get_statistics(self) -> Dict:
-        try:
-            # Get total count
-            total_count_response = self.collection.aggregate.over_all(
-                total_count=True
-            )
-            total_count = total_count_response.total_count
-
-            # Get class distribution using aggregate
-            class_counts = self.collection.aggregate.over_all().group_by(
-                property_name="class"
-            ).objects
-
-            class_distribution = {}
-            for group in class_counts:
-                if hasattr(group, 'properties'):
-                    class_name = group.properties.get('class', 'unknown')
-                    count = group.count
-                    class_distribution[class_name] = count
-
-            return {
-                "total_ingredients": total_count,
-                "class_distribution": class_distribution
-            }
-        except Exception as e:
-            print(f"Error getting statistics: {e}")
-            return {"total_ingredients": 0, "class_distribution": {}}
-
     def search_similar_ingredients(self, query_text: str, limit: int = 5) -> List[Dict]:
+        """Search for similar ingredients using vector similarity."""
         try:
             response = self.collection.query.near_text(
-                query=query_text,
+                query=query_text.lower(),  # Convert query to lowercase to match preprocessing
                 limit=limit,
                 return_metadata=MetadataQuery(distance=True)
             )
@@ -121,122 +170,73 @@ class IngredientsDB:
             if hasattr(response, 'objects'):
                 for obj in response.objects:
                     results.append({
-                        "properties": obj.properties,
-                        "distance": getattr(obj.metadata, 'distance', 0)
+                        "ingredient": obj.properties.get("ingredient", ""),
+                        "similarity": 1 - getattr(obj.metadata, 'distance', 0)
                     })
             return results
         except Exception as e:
             print(f"Error in similarity search: {e}")
             return []
 
-    def search_by_class(self, class_type: str, limit: int = 5) -> List[Dict]:
+    def get_all_ingredients(self) -> List[str]:
+        """Get all ingredients in the database."""
         try:
-            # Create filter using Filter class
-            class_filter = Filter.by_property("class") == class_type
-
             response = self.collection.query.fetch_objects(
-                limit=limit,
-                filters=class_filter
+                limit=10000  # Adjust based on your expected data size
             )
 
-            results = []
+            ingredients = []
             if hasattr(response, 'objects'):
-                for obj in response.objects:
-                    results.append({
-                        "ingredient": obj.properties.get("ingredient", ""),
-                        "class": obj.properties.get("class", ""),
-                        "reason": obj.properties.get("reason", "")
-                    })
-            return results
+                ingredients = [obj.properties.get("ingredient", "")
+                               for obj in response.objects]
+            return sorted(ingredients)
         except Exception as e:
-            print(f"Error in class search: {e}")
+            print(f"Error fetching all ingredients: {e}")
             return []
 
     def close(self):
+        """Close the database connection."""
         try:
             if hasattr(self, 'client'):
                 self.client.close()
         except Exception as e:
             print(f"Error closing connection: {e}")
 
-    def search_similar_ingredients_by_name(self, ingredient_name: str, limit: int = 5) -> List[Dict]:
-        """
-        Search for ingredients with similar names to the provided ingredient name.
 
-        Args:
-            ingredient_name: The name of the ingredient to find similar matches for
-            limit: Maximum number of results to return
-
-        Returns:
-            List of similar ingredients with their similarity scores
-        """
-        try:
-            # Use near_text instead of hybrid for better compatibility
-            response = self.collection.query.near_text(
-                query=ingredient_name,
-                limit=limit,
-                return_metadata=MetadataQuery(distance=True)
-            )
-
-            results = []
-            if hasattr(response, 'objects'):
-                for obj in response.objects:
-                    results.append({
-                        "ingredient": obj.properties.get("ingredient", ""),
-                        "class": obj.properties.get("class", ""),
-                        "reason": obj.properties.get("reason", ""),
-                        "similarity_score": 1 - getattr(obj.metadata, 'distance', 0)
-                    })
-
-            # Sort results by similarity score
-            results.sort(key=lambda x: x['similarity_score'], reverse=True)
-            return results
-        except Exception as e:
-            print(f"Error in name similarity search: {e}")
-            return []
-
-    def get_ingredient_details(self, ingredient_name: str) -> Dict:
-        """
-        Get full details for a specific ingredient by exact name match.
-        """
-        try:
-            filter_by_name = Filter.by_property("ingredient") == ingredient_name
-            response = self.collection.query.fetch_objects(
-                limit=1,
-                filters=filter_by_name
-            )
-
-            if hasattr(response, 'objects') and len(response.objects) > 0:
-                obj = response.objects[0]
-                return {
-                    "ingredient": obj.properties.get("ingredient", ""),
-                    "class": obj.properties.get("class", ""),
-                    "reason": obj.properties.get("reason", ""),
-                    "int_label": obj.properties.get("int_label", ""),
-                    "prompt": obj.properties.get("prompt", "")
-                }
-            return {}
-        except Exception as e:
-            print(f"Error getting ingredient details: {e}")
-            return {}
+def get_similar_ingredients(ingredient: str) -> List[str]:
+    """Get similar ingredients for a given ingredient."""
+    with IngredientsDB() as db:
+        similar_ingredients = db.search_similar_ingredients(ingredient, limit=5)
+        return [item['ingredient'] for item in similar_ingredients]
 
 
-def get_similar_ingredients(ingredient, db=None):
-    # Initialize the database only if not provided
-    if db is None:
-        db = IngredientsDB()
-
-    similar_ingredients = db.search_similar_ingredients_by_name(ingredient, limit=5)
-    return [ingre['ingredient'] for ingre in similar_ingredients]
+def get_cache_location():
+    """Utility function to get the location of the cache file."""
+    db = IngredientsDB()
+    return db.cache_file
 
 
 if __name__ == '__main__':
     # Initialize once
     db = IngredientsDB()
 
-    # Reuse the same connection for multiple queries
+    # Print cache file location
+    print(f"\nCache file location: {db.cache_file}")
+
+    # Example: Print all unique ingredients
+    print("\nAll ingredients in database:")
+    all_ingredients = db.get_all_ingredients()
+    print(f"Total unique ingredients: {len(all_ingredients)}")
+    print("Sample of ingredients:", all_ingredients[:10])
+
+    # Interactive search loop
+    print("\nStarting interactive search...")
     while True:
-        user_input = input('Ingredient (or "quit" to exit): ')
+        user_input = input('\nIngredient (or "quit" to exit): ')
         if user_input.lower() == 'quit':
             break
-        print(get_similar_ingredients(user_input, db=db))
+
+        similar = get_similar_ingredients(user_input, db=db)
+        print("\nSimilar ingredients:")
+        for ing in similar:
+            print(f"- {ing}")

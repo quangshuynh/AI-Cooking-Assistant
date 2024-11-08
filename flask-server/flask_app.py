@@ -3,17 +3,31 @@ import jinja2
 import os
 import sys
 import subprocess
+from functools import partial
+from contextlib import contextmanager
 from backend import ingredient_db_efficient
 from backend.recipe_vector_DB import get_similar_recipes
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir), autoescape=True)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+llm_path = os.path.join(current_dir, 'backend', 'LLM.py')
 
 app = Flask(__name__)
+
 
 @app.route("/")
 def home():
     return render_template('index.html')
+
+
+@contextmanager
+def handle_db_connection():
+    try:
+        yield
+    finally:
+        if hasattr(app, '_db'):
+            app._db.close()
 
 @app.route('/suggest_ingredients')
 def suggest_ingredients():
@@ -21,11 +35,9 @@ def suggest_ingredients():
     if not query.strip():
         return jsonify([])
 
-    # Use your existing function to get similar ingredients
-    similar_ingredients = ingredient_db_efficient.get_similar_ingredients(query)
-
-    # Return the suggestions (limiting to 5 if needed)
-    return jsonify(similar_ingredients[:5])
+    with handle_db_connection():
+        similar_ingredients = ingredient_db_efficient.get_similar_ingredients(query)
+        return jsonify(similar_ingredients[:5])
 
 @app.route('/find_recipes', methods=['POST'])
 def find_recipes():
@@ -63,31 +75,50 @@ def find_recipes():
         print(f"Error in find_recipes: {str(e)}")  # Debug print
         return jsonify({'error': str(e)}), 500
 
+
 @app.route("/generate_recipe", methods=["POST"])
 def generate_recipe():
     data = request.get_json()
-    selected_ingredients = data.get('ingredients', []) #debugging
-    print(selected_ingredients)
-    
+    selected_ingredients = data.get('ingredients', [])
+    cuisine = data.get("cuisine", "")
+    meal_type = data.get("meal_type", "")
+    print("Ingredients: " + str(selected_ingredients))
+    print("Cuisine: " + str(cuisine))
+    print("Meal type: " + str(meal_type))
+
     # run the LLM and capture the formatted HTML output
-    recipe_html = run_llm(selected_ingredients)
-    
+    recipe_html = run_llm(selected_ingredients, cuisine, meal_type)
+
     return jsonify({"recipe_html": recipe_html})
 
 
-def run_llm(ingredients):
+def run_llm(ingredients, cuisine, meal_type):
     try:
         ingredients_str = "The ingredients are: " + ", ".join(ingredients)
-        result = subprocess.run([sys.executable, '../backend/LLM.py', ingredients_str], capture_output=True, text=True)
-    
+        meal_type_str = meal_type
+        if cuisine and isinstance(cuisine, str):
+            cuisine_str = "The cuisine is: " + "".join(cuisine)
+        else:
+            cuisine_str = ""
+        if meal_type_str and isinstance(meal_type_str, str):
+            meal_type_str = "The meal time (for example: breakfast, lunch, dinner) is:" + "".join(meal_type)
+        else:
+            meal_type_str = " "
+        combined = ingredients_str + " and " + cuisine_str + " and " + meal_type_str
+        print(combined)
+        result = subprocess.run([sys.executable, llm_path, combined], capture_output=True, text=True)
 
-        if result.returncode != 0: 
+        if result.returncode != 0:
             return f"Error generating recipe: {result.stderr}"
-        
+
         return result.stdout  # return the recipe output
     except Exception as e:
         return f"Exception while generating recipe: {str(e)}"
 
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    if hasattr(app, '_db'):
+        app._db.close()
 
 if __name__ == "__main__":
     app.run(debug=True)
