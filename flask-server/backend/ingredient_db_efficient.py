@@ -8,7 +8,6 @@ from typing import Dict, List, Any
 import atexit
 import os
 import pickle
-
 import os.path
 
 
@@ -208,6 +207,7 @@ def get_similar_ingredients(ingredient: str) -> List[str]:
     with IngredientsDB() as db:
         similar_ingredients = db.search_similar_ingredients(ingredient, limit=5)
         return [item['ingredient'] for item in similar_ingredients]
+
 
 
 def get_cache_location():
