@@ -1,6 +1,6 @@
 # AI Cooking Assistant
 
-The AI Cooking Assistant is an intelligent recipe generator that allows users to create personalized recipes based on their available ingredients, dietary restrictions, budget, and cuisine preferences. It leverages AI and a database of recipes to generate or find meals tailored to user inputs.
+The AI Cooking Assistant is an intelligent recipe generator that allows users to create personalized recipes based on their available ingredients, dietary restrictions, budget, and cuisine preferences. It uses AI and a database of recipes to generate or find meals tailored to user inputs.
 
 ## Features
 - Ingredient-based recipe generation
