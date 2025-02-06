@@ -32,7 +32,7 @@ Ensure you have the following installed:
 ### Setup Instructions
 1. Clone the repository:
    ```sh
-   git clone https://github.com/your-username/ai-cooking-assistant.git
+   git clone https://github.com/quangshuynh/ai-cooking-assistant.git
    cd ai-cooking-assistant
    ```
 
