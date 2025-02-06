@@ -1,0 +1,16 @@
+flask
+weaviate-client
+requests
+jinja2
+numpy
+pandas
+pyyaml
+atexit
+subprocess
+sys
+os
+re
+time
+json
+ast
+
