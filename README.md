@@ -117,10 +117,3 @@ To containerize the application, ensure you have Docker installed and follow the
   ```json
   ["Chicken", "Garlic", "Tomato"]
   ```
-
-## Contributing
-Contributions are welcome! Feel free to fork this project and submit a pull request with improvements or new features.
-
-## License
-This project is licensed under the MIT License. See `LICENSE` for more details.
-
