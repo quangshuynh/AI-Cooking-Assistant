@@ -92,7 +92,7 @@ def run_llm(ingredients, cuisine, meal_type):
             cuisine_str = "The cuisine is: " + "".join(cuisine)
         else:
             cuisine_str = ""
-        if meal_type_str and isinstance(meal_type_str, str):
+        if meal_type and isinstance(meal_type, str):
             meal_type_str = "The meal time (for example: breakfast, lunch, dinner) is:" + "".join(meal_type)
         else:
             meal_type_str = " "
