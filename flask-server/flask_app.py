@@ -34,7 +34,12 @@ def suggest_ingredients():
         # Use the initialized database instance
         similar_ingredients = ingredient_db.search_similar_ingredients(query, limit=5)
         # Extract just the ingredient names from the results
-        suggestions = [item['ingredient'] for item in similar_ingredients]
+        suggestions = []
+        for item in similar_ingredients:
+            if isinstance(item, dict) and 'properties' in item:
+                ingredient = item['properties'].get('ingredient')
+                if ingredient:
+                    suggestions.append(ingredient)
         return jsonify(suggestions)
     except Exception as e:
         print(f"Error suggesting ingredients: {e}")
@@ -64,13 +69,19 @@ def find_recipes():
         formatted_recipes = []
         for recipe in recipes:
             try:
-                # Try to parse ingredients if they're stored as a string representation of a list
+                # Handle ingredients parsing more safely
                 ingredients = recipe.get('ingredients', '')
                 if isinstance(ingredients, str):
                     try:
-                        ingredients = eval(ingredients)
-                    except:
-                        ingredients = ingredients.split(',')
+                        # Try to evaluate if it looks like a list literal
+                        if ingredients.strip().startswith('[') and ingredients.strip().endswith(']'):
+                            ingredients = eval(ingredients)
+                        else:
+                            # Split by commas and clean up each ingredient
+                            ingredients = [i.strip() for i in ingredients.split(',') if i.strip()]
+                    except Exception as e:
+                        print(f"Error parsing ingredients: {e}")
+                        ingredients = [ingredients]  # Keep as single item if parsing fails
                 
                 formatted_recipe = {
                     'title': recipe.get('title', 'Untitled Recipe'),
