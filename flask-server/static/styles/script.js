@@ -206,8 +206,7 @@ function handleSuggestionClick(suggestion) {
             categoryList.style.display = 'flex';
         }
 
-        // Scroll to the ingredient
-        ingredient.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Don't scroll to the ingredient
     }
 
     // Hide suggestions and reapply filters
