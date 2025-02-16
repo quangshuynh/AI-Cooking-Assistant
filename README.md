@@ -42,7 +42,7 @@ An intelligent recipe generation application that creates personalized recipes b
    git clone https://github.com/quangshuynh/AI-Cooking-Assistant.git
    cd ai-cooking-assistant
    ```
-
+   
 2. Create and activate a virtual environment (optional but recommended):
   ```bash
   python -m venv venv
