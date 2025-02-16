@@ -434,6 +434,10 @@ async function generateRecipe() {
                 recipesHtml += '<p>No recipes found</p>';
             }
             recipeDisplay.innerHTML = recipesHtml;
+            
+            // Hide cancel button and re-enable generate button when done
+            document.getElementById('cancel-btn').style.display = 'none';
+            document.getElementById('generate-btn').disabled = false;
         } else {
             let recipesHtml = '<h3>Generated Recipes</h3>';
             if (Array.isArray(result.recipes) && result.recipes.length > 0) {
