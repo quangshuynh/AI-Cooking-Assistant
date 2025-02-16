@@ -134,18 +134,38 @@ def create_recipe_list(ingredients: list[str] = None, cost: int = 0, cuisine: st
         STEPS += 1
 
         response = model.chat([system_prompt, user_prompt])
+        if not response:
+            print("No response from model")
+            continue
 
         try:
             recipe_list_dict = parse_recipe_list(response)
-            assert isinstance(recipe_list_dict, list)
-            assert isinstance(recipe_list_dict[0], dict)
-            assert isinstance(recipe_list_dict[0]['recipe'], str)
-            assert isinstance(recipe_list_dict[0]['description'], str)
+            if not recipe_list_dict:
+                print("Could not parse recipe list")
+                continue
+                
+            if not isinstance(recipe_list_dict, list):
+                print(f"Expected list but got {type(recipe_list_dict)}")
+                continue
+                
+            if not recipe_list_dict:
+                print("Empty recipe list")
+                continue
+                
+            if not isinstance(recipe_list_dict[0], dict):
+                print(f"Expected dict but got {type(recipe_list_dict[0])}")
+                continue
+                
+            if not all(isinstance(recipe.get('recipe'), str) and isinstance(recipe.get('description'), str) 
+                      for recipe in recipe_list_dict):
+                print("Invalid recipe format")
+                continue
 
             return recipe_list_dict
         except Exception as e:
             print(f"Error parsing recipe list: {e}")
-            pass
+            print(f"Response was: {response[:200]}...")  # Print first 200 chars of response
+            continue
 
     return []
 
