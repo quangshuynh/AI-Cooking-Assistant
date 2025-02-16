@@ -54,7 +54,7 @@ An intelligent recipe generation application that creates personalized recipes b
    ```
    
 4. Create a `.env` file in the project root:
-   #### Ollama:
+   ##### Ollama:
    ```env
    DEFAULT_MODEL_PROVIDER=ollama
 
@@ -62,7 +62,7 @@ An intelligent recipe generation application that creates personalized recipes b
    OLLAMA_HOST=http://localhost:11434
    OLLAMA_MODEL=dolphin-llama3
    ```
-  #### Anthropic Claude:
+  ##### Anthropic Claude:
    ```env
    DEFAULT_MODEL_PROVIDER=anthropic
 
