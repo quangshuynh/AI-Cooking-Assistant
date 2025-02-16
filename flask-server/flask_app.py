@@ -1,21 +1,22 @@
 from flask import Flask, render_template, request, jsonify
 import jinja2
 import os
-import sys
-import subprocess
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
-from backend import ingredient_db_efficient
-from backend.recipe_vector_DB import get_similar_recipes
+
+from backend.ingredient_db_efficient import IngredientDBEfficient
+from backend.recipe_vector_DB import RecipeDB
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir), autoescape=True)
-current_dir = os.path.dirname(os.path.abspath(__file__))
-llm_path = os.path.join(current_dir, 'backend', 'LLM.py')
 
 app = Flask(__name__)
+
+# Initialize databases
+ingredient_db = IngredientDBEfficient()
+recipe_db = RecipeDB()
 
 
 @app.route("/")
@@ -29,11 +30,15 @@ def suggest_ingredients():
     if not query.strip():
         return jsonify([])
 
-    # Use your existing function to get similar ingredients
-    similar_ingredients = ingredient_db_efficient.get_similar_ingredients(query)
-
-    # Return the suggestions (limiting to 5 if needed)
-    return jsonify(similar_ingredients[:5])
+    try:
+        # Use the initialized database instance
+        similar_ingredients = ingredient_db.search_similar_ingredients(query, limit=5)
+        # Extract just the ingredient names from the results
+        suggestions = [item['ingredient'] for item in similar_ingredients]
+        return jsonify(suggestions)
+    except Exception as e:
+        print(f"Error suggesting ingredients: {e}")
+        return jsonify([])
 
 
 @app.route('/find_recipes', methods=['POST'])
@@ -47,29 +52,41 @@ def find_recipes():
             return jsonify({'error': 'Missing query parameter'}), 400
 
         query = data.get('query', '')
-        print(f"Received query: {query}")  # Debug print
+        print(f"Searching recipes for: {query}")
 
-        # Get recipes from your database
-        recipes = get_similar_recipes(query)
-        print(f"Found recipes: {recipes}")  # Debug print
-
+        # Search recipes using the initialized database
+        recipes = recipe_db.search_similar_recipes_by_ingredients(query, limit=3)
+        
         if not recipes:
             return jsonify({'recipes': []})
 
-        # Ensure we have all required fields
+        # Format the recipes for response
         formatted_recipes = []
-        for recipe in recipes[:3]:  # Only take top 3
-            formatted_recipe = {
-                'title': recipe.get('title', 'Untitled Recipe'),
-                'ingredients': recipe.get('ingredients', 'No ingredients listed'),
-                'instructions': recipe.get('instructions', 'No instructions available')
-            }
-            formatted_recipes.append(formatted_recipe)
+        for recipe in recipes:
+            try:
+                # Try to parse ingredients if they're stored as a string representation of a list
+                ingredients = recipe.get('ingredients', '')
+                if isinstance(ingredients, str):
+                    try:
+                        ingredients = eval(ingredients)
+                    except:
+                        ingredients = ingredients.split(',')
+                
+                formatted_recipe = {
+                    'title': recipe.get('title', 'Untitled Recipe'),
+                    'ingredients': ingredients,
+                    'instructions': recipe.get('instructions', 'No instructions available'),
+                    'similarity': recipe.get('similarity_score', 0)
+                }
+                formatted_recipes.append(formatted_recipe)
+            except Exception as e:
+                print(f"Error formatting recipe: {e}")
+                continue
 
         return jsonify({'recipes': formatted_recipes})
 
     except Exception as e:
-        print(f"Error in find_recipes: {str(e)}")  # Debug print
+        print(f"Error in find_recipes: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 
@@ -87,9 +104,11 @@ def generate_recipe():
         if not ingredients:
             return jsonify({"error": "No ingredients provided"}), 400
 
-        # Call LLM directly instead of using subprocess
+        # Import LLM functions
         from backend.LLM import create_recipe_list, write_recipe
         
+        # Generate recipe list
+        print(f"Generating recipes for ingredients: {ingredients}")
         recipes_list = create_recipe_list(
             ingredients=ingredients,
             cuisine=cuisine,
@@ -97,29 +116,38 @@ def generate_recipe():
         )
 
         if not recipes_list:
-            return jsonify({"error": "No recipes generated"}), 404
+            return jsonify({"error": "No recipes could be generated"}), 404
 
+        # Format each recipe
         formatted_recipes = []
-        for idx, recipe_info in enumerate(recipes_list):
-            recipe = write_recipe(
-                name=recipe_info['recipe'],
-                description=recipe_info['description'],
-                ingredients=ingredients,
-                cuisine=cuisine,
-                meal_type=meal_type
-            )
-            
-            if recipe:
-                formatted_recipes.append({
-                    "name": recipe_info['recipe'],
-                    "description": recipe_info['description'],
-                    "ingredients": recipe['ingredients'],
-                    "instructions": recipe['instructions']
-                })
+        for recipe_info in recipes_list:
+            try:
+                recipe = write_recipe(
+                    name=recipe_info['recipe'],
+                    description=recipe_info['description'],
+                    ingredients=ingredients,
+                    cuisine=cuisine,
+                    meal_type=meal_type
+                )
+                
+                if recipe:
+                    formatted_recipes.append({
+                        "name": recipe_info['recipe'],
+                        "description": recipe_info['description'],
+                        "ingredients": recipe['ingredients'],
+                        "instructions": recipe['instructions']
+                    })
+            except Exception as e:
+                print(f"Error formatting recipe: {e}")
+                continue
+
+        if not formatted_recipes:
+            return jsonify({"error": "Failed to format recipes"}), 500
 
         return jsonify({"recipes": formatted_recipes})
 
     except Exception as e:
+        print(f"Error generating recipe: {e}")
         return jsonify({"error": str(e)}), 500
 
 
