@@ -108,7 +108,8 @@ def generate_recipe():
         if not data:
             return jsonify({"error": "No data provided"}), 400
 
-        ingredients = data.get('ingredients', [])
+        # Get ingredients and ensure they're properly formatted
+        ingredients = [ing.strip() for ing in data.get('ingredients', []) if ing.strip()]
         cuisine = data.get("cuisine", "")
         meal_type = data.get("meal_type", "")
 

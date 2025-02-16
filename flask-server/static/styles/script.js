@@ -309,6 +309,9 @@ function updateSelectedIngredientsDisplay() {
     } else {
         container.innerHTML = '';
     }
+
+    // Store all selected ingredients in a data attribute for easy access
+    container.setAttribute('data-selected-ingredients', JSON.stringify(allIngredients));
 }
 
 function removeIngredient(ingredientName) {
@@ -325,8 +328,8 @@ function unselectAllIngredients() {
 }
 
 async function generateRecipe() {
-    const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
-        .map(item => item.textContent);
+    const container = document.getElementById('selected-ingredients-container');
+    const selectedIngredients = JSON.parse(container.getAttribute('data-selected-ingredients') || '[]');
 
     const selectedCuisine = document.getElementById('cuisine').value;
     const customCuisine = document.getElementById('custom-cuisine').value;
