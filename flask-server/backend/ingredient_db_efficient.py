@@ -225,7 +225,7 @@ def get_similar_ingredients(ingredient, db=None):
         db = IngredientDBEfficient()
 
     similar_ingredients = db.search_similar_ingredients(ingredient, limit=5)
-    return [ingre['ingredient'] for ingre in similar_ingredients['properties']] if similar_ingredients else []
+    return [ingre['properties']['ingredient'] for ingre in similar_ingredients] if similar_ingredients else []
 
 
 if __name__ == '__main__':
