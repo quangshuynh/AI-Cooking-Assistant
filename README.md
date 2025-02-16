@@ -37,23 +37,20 @@ An intelligent recipe generation application that creates personalized recipes b
 - NumPy (`pip install numpy`)
 
 ### Setup Instructions
-1. Clone the repository:
+1. Clone the repository:  
    ```sh
    git clone https://github.com/quangshuynh/AI-Cooking-Assistant.git
    cd ai-cooking-assistant
    ```
-   
 2. Create and activate a virtual environment (optional but recommended):
   ```bash
   python -m venv venv
   source venv/bin/activate  # On Windows: venv\Scripts\activate
   ```
-
 3. Install dependencies:
   ```bash
   pip install -r requirements.txt
   ```
-
 4. Create a `.env` file in the project root:
   ```env
   # Model Selection (options: ollama, anthropic)
@@ -67,17 +64,14 @@ An intelligent recipe generation application that creates personalized recipes b
   ANTHROPIC_API_KEY=your-api-key-here
   ANTHROPIC_MODEL=claude-3-opus-20240229
   ```
-
 5. Start the Weaviate database (optional, if using local vector search):
    ```sh
    weaviate --host localhost --port 8080
    ```
-
 6. Run the application:
   ```bash
   python flask-server/flask_app.py
   ```
-
 7. Open your browser and navigate to:
   ```
   http://127.0.0.1:5000
