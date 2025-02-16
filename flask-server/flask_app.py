@@ -33,13 +33,24 @@ def suggest_ingredients():
     try:
         # Use the initialized database instance
         similar_ingredients = ingredient_db.search_similar_ingredients(query, limit=5)
-        # Extract just the ingredient names from the results
+        # Add the search query as first suggestion if no exact match exists
         suggestions = []
+        query_capitalized = ' '.join(word.capitalize() for word in query.strip().split())
+        
+        # Extract ingredient names from results
+        result_ingredients = []
         for item in similar_ingredients:
             if isinstance(item, dict) and 'properties' in item:
                 ingredient = item['properties'].get('ingredient')
                 if ingredient:
-                    suggestions.append(ingredient)
+                    result_ingredients.append(ingredient.lower())
+        
+        # Add search query first if it's not in results
+        if query.lower() not in result_ingredients:
+            suggestions.append(query_capitalized)
+        
+        # Add other suggestions
+        suggestions.extend(result_ingredients)
         return jsonify(suggestions)
     except Exception as e:
         print(f"Error suggesting ingredients: {e}")

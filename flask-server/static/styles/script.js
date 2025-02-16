@@ -196,10 +196,8 @@ function handleSuggestionClick(suggestion) {
     const existingIngredients = Array.from(document.querySelectorAll('.selected-ingredient-button'))
         .map(btn => btn.textContent.toLowerCase());
     
-    // Capitalize first letter of each word
-    const formattedSuggestion = suggestion.split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(' ');
+    // Use suggestion as-is since it's already properly capitalized from the server
+    const formattedSuggestion = suggestion;
     
     // Only add if not already selected (case-insensitive check)
     if (!existingIngredients.includes(suggestion.toLowerCase())) {
