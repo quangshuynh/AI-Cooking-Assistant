@@ -192,28 +192,24 @@ function filterIngredients() {
 }
 
 function handleSuggestionClick(suggestion) {
-    // Show all categories temporarily
-    showAllCategories();
-
-    // Find and select the ingredient
-    const ingredient = findIngredientElement(suggestion);
-    if (ingredient && !ingredient.classList.contains('disabled')) {
-        selectIngredient(ingredient);
-        
-        // Make sure its category is visible
-        const categoryList = ingredient.parentElement;
-        if (categoryList) {
-            categoryList.style.display = 'flex';
-        }
-
-        // Don't scroll to the ingredient
+    // Create a new ingredient button directly
+    const container = document.getElementById('selected-ingredients-container');
+    const existingIngredients = Array.from(document.querySelectorAll('.selected-ingredient-button'))
+        .map(btn => btn.textContent);
+    
+    // Only add if not already selected
+    if (!existingIngredients.includes(suggestion)) {
+        const button = document.createElement('button');
+        button.className = 'selected-ingredient-button';
+        button.textContent = suggestion;
+        button.onclick = () => removeIngredient(suggestion);
+        container.appendChild(button);
     }
 
-    // Hide suggestions and reapply filters
+    // Hide suggestions and clear search
     searchSuggestionsContainer.style.display = 'none';
-    filterIngredients();
-
-    return !!ingredient;
+    clearSearch();
+    return true;
 }
 
 async function handleIngredientSearch(event) {
