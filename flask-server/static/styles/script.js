@@ -330,9 +330,15 @@ function removeIngredient(ingredientName) {
 }
 
 function unselectAllIngredients() {
+    // Clear selected ingredients from the list
     document.querySelectorAll('.ingredient-item.selected').forEach(item => {
         deselectIngredient(item);
     });
+    
+    // Clear selected ingredients container
+    const container = document.getElementById('selected-ingredients-container');
+    container.innerHTML = '';
+    container.setAttribute('data-selected-ingredients', '[]');
 }
 
 async function generateRecipe() {
