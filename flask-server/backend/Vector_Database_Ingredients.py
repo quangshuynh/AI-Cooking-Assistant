@@ -25,18 +25,28 @@ class IngredientsDB:
     def _ensure_collection(self) -> None:
         """Ensure collection exists and is properly initialized."""
         try:
-            # First try to delete any existing collection
-            try:
-                collections = self.client.collections.list_all()
-                collection_name = self.collection_name.lower()
-                if collection_name in collections:
-                    print(f"Deleting existing collection: {collection_name}")
-                    self.client.collections.delete(collection_name)
-            except Exception as e:
-                print(f"Warning during collection cleanup: {e}")
-
-            print("Creating new collection...")
+            collections = self.client.collections.list_all()
+            collection_name = self.collection_name.lower()
             
+            if collection_name in collections:
+                print(f"Using existing collection: {collection_name}")
+                self.collection = self.client.collections.get(collection_name)
+                
+                # Check if collection has data
+                try:
+                    count = self.collection.query.fetch_objects(limit=1)
+                    if hasattr(count, 'objects') and len(count.objects) > 0:
+                        print(f"Collection has existing data")
+                        return
+                except Exception as e:
+                    print(f"Collection exists but may be empty: {e}")
+            
+            # Only delete and recreate if needed
+            if collection_name in collections:
+                print("Deleting empty collection...")
+                self.client.collections.delete(collection_name)
+            
+            print("Creating new collection...")
             self._create_collection()
             self._initialize_data()
             
