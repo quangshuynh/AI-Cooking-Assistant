@@ -211,7 +211,7 @@ button.generate-btn:hover {
 
 #additional-filters h2 {
     font-size: 1.3rem;
-    color: #333;
+    color: var(--text-color);
     margin-bottom: 0.5rem;
 }
 
@@ -220,19 +220,23 @@ button.generate-btn:hover {
     align-items: center;
     margin-bottom: 0.5rem;
     font-size: 1rem;
-    color: #666;
+    color: var(--text-color);
 }
 
 #additional-filters input[type="number"],
-#additional-filters select {
+#additional-filters select,
+.mode-select,
+#recipe-mode {
     flex: 1;
     padding: 0.5rem;
     margin-left: 0.5rem;
     font-size: 1rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
     outline: none;
     transition: border-color 0.3s;
+    background-color: var(--input-bg);
+    color: var(--input-text);
 }
 
 #additional-filters input[type="number"]:focus,
@@ -267,8 +271,8 @@ button.generate-btn:hover {
 
 /* Selected Ingredients Section */
 #selected-ingredients-section {
-    background-color: #e9e4e4; /* Gray background */
-    padding: 0; /* Remove padding to align it */
+    background-color: var(--bg-color);
+    padding: 0;
     border-radius: 5px;
     margin-bottom: 1rem;
 }
@@ -291,7 +295,7 @@ button.generate-btn:hover {
 
 #selected-ingredients-display p {
     font-size: 1.1rem;
-    color: #333;
+    color: var(--text-color);
     margin: 0;
 }
 

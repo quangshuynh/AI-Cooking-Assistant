@@ -52,13 +52,20 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Easter egg trigger
     const header = document.querySelector('header');
+    let storedEasterEggState = localStorage.getItem('easterEggActive') === 'true';
+    if (storedEasterEggState) {
+        activateEasterEgg();
+    }
+
     header.addEventListener('click', () => {
         titleClickCount++;
         if (titleClickCount >= 10) {
             if (!easterEggActive) {
                 activateEasterEgg();
-            } else {
+                localStorage.setItem('easterEggActive', 'true');
+            } else if (titleClickCount >= 20) {
                 deactivateEasterEgg();
+                localStorage.setItem('easterEggActive', 'false');
                 titleClickCount = 0;
             }
         }
