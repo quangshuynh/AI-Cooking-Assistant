@@ -25,27 +25,25 @@ class IngredientsDB:
     def _ensure_collection(self) -> None:
         """Ensure collection exists and is properly initialized."""
         try:
-            collections = self.client.collections.list_all()
             collection_name = self.collection_name.lower()
             
-            if collection_name in collections:
-                print(f"Using existing collection: {collection_name}")
+            try:
+                # Try to get existing collection
                 self.collection = self.client.collections.get(collection_name)
+                print(f"Using existing collection: {collection_name}")
                 
                 # Check if collection has data
-                try:
-                    count = self.collection.query.fetch_objects(limit=1)
-                    if hasattr(count, 'objects') and len(count.objects) > 0:
-                        print(f"Collection has existing data")
-                        return
-                except Exception as e:
-                    print(f"Collection exists but may be empty: {e}")
+                count = self.collection.query.fetch_objects(limit=1)
+                if hasattr(count, 'objects') and len(count.objects) > 0:
+                    print(f"Collection has existing data")
+                    return
+                
+                print("Collection exists but is empty")
+                
+            except weaviate.exceptions.UnexpectedStatusCodeError:
+                print("Collection does not exist")
             
-            # Only delete and recreate if needed
-            if collection_name in collections:
-                print("Deleting empty collection...")
-                self.client.collections.delete(collection_name)
-            
+            # Only create if collection doesn't exist or is empty
             print("Creating new collection...")
             self._create_collection()
             self._initialize_data()
