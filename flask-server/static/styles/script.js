@@ -391,17 +391,20 @@ async function generateRecipe() {
             let recipesHtml = '<h3>Found Recipes</h3>';
             if (Array.isArray(result.recipes) && result.recipes.length > 0) {
                 result.recipes.forEach((recipe, index) => {
-                    // Split instructions into an array and clean up any empty lines
-                    const instructionsArray = recipe.instructions
-                        .split(/[.!?]\s+/)
-                        .filter(instruction => instruction.trim().length > 0)
-                        .map(instruction => instruction.trim());
+                    // Handle instructions
+                    const instructionsArray = typeof recipe.instructions === 'string' 
+                        ? recipe.instructions
+                            .split(/[.!?]\s+/)
+                            .filter(instruction => instruction.trim().length > 0)
+                            .map(instruction => instruction.trim())
+                        : [recipe.instructions];
 
-                    // Split ingredients into an array and clean up
-                    const ingredientsArray = recipe.ingredients
-                        .split(',')
-                        .map(ingredient => ingredient.trim())
-                        .filter(ingredient => ingredient.length > 0);
+                    // Handle ingredients
+                    const ingredientsArray = Array.isArray(recipe.ingredients)
+                        ? recipe.ingredients
+                        : typeof recipe.ingredients === 'string'
+                            ? recipe.ingredients.split(',').map(i => i.trim()).filter(i => i.length > 0)
+                            : [];
 
                     recipesHtml += `
                         <div class="recipe-container">
