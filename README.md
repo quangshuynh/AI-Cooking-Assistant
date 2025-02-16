@@ -52,8 +52,9 @@ An intelligent recipe generation application that creates personalized recipes b
    ```sh
    weaviate --host localhost --port 8080
    ```
-   
+
 4. Create a `.env` file in the project root:
+
    ##### Ollama:
    ```env
    DEFAULT_MODEL_PROVIDER=ollama
@@ -62,7 +63,8 @@ An intelligent recipe generation application that creates personalized recipes b
    OLLAMA_HOST=http://localhost:11434
    OLLAMA_MODEL=dolphin-llama3
    ```
-  ##### Anthropic Claude:
+
+   ##### Anthropic Claude:
    ```env
    DEFAULT_MODEL_PROVIDER=anthropic
 
@@ -70,7 +72,6 @@ An intelligent recipe generation application that creates personalized recipes b
    ANTHROPIC_API_KEY=your-api-key-here
    ANTHROPIC_MODEL=claude-3-opus-20240229
    ```
-   
 
 5. Run the Flask server:
    ```sh
@@ -80,7 +81,6 @@ An intelligent recipe generation application that creates personalized recipes b
 6. Open a browser and navigate to:
    ```
    http://127.0.0.1:5000/
-   ```
 
 ## Deployment
 ### Docker (Optional)
