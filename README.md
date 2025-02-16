@@ -54,27 +54,30 @@ An intelligent recipe generation application that creates personalized recipes b
    ```
    
 4. Create a `.env` file in the project root:
+   #### Ollama:
    ```env
-   # Model Selection
    DEFAULT_MODEL_PROVIDER=ollama
 
+   # Ollama Settings 
    OLLAMA_HOST=http://localhost:11434
    OLLAMA_MODEL=dolphin-llama3
-  ```
-
+   ```
+  #### Anthropic Claude:
    ```env
    DEFAULT_MODEL_PROVIDER=anthropic
-   
+
+   # Anthropic Settings
    ANTHROPIC_API_KEY=your-api-key-here
    ANTHROPIC_MODEL=claude-3-opus-20240229
-  ```
+   ```
+   
 
-5. Run the Flask server:
+6. Run the Flask server:
    ```sh
    python flask-server/flask_app.py
    ```
 
-6. Open a browser and navigate to:
+7. Open a browser and navigate to:
    ```
    http://127.0.0.1:5000/
    ```
