@@ -18,8 +18,14 @@ class ModelFactory:
             BaseModel: Instance of the requested model
         """
         if provider is None:
-            provider = os.getenv('DEFAULT_MODEL_PROVIDER', 'ollama').lower().strip()
+            provider = os.getenv('DEFAULT_MODEL_PROVIDER')
+            if not provider:
+                print("WARNING: DEFAULT_MODEL_PROVIDER not found in environment variables")
+                provider = 'ollama'
+            else:
+                provider = provider.lower().strip()
             print(f"Using model provider: {provider}")
+            print(f"Environment variables loaded: {dict(os.environ)}")
 
         provider = provider.lower()
         if provider == 'ollama':

@@ -3,6 +3,10 @@ import jinja2
 import os
 import sys
 import subprocess
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 from backend import ingredient_db_efficient
 from backend.recipe_vector_DB import get_similar_recipes
 

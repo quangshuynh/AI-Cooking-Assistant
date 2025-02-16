@@ -13,14 +13,30 @@ class OllamaModel(BaseModel):
     def chat(self, messages: List[Dict[str, str]], **kwargs) -> str:
         try:
             print(f"Using Ollama model: {self.model}")
-            response = self.client.chat(
-                model=self.model,
-                messages=messages,
-                stream=False
-            )
-            return response['message']['content']
+            try:
+                # First check if model is available
+                models = self.client.list()
+                print(f"Available models: {models}")
+                
+                if not any(self.model in model['name'] for model in models['models']):
+                    print(f"Model {self.model} not found in available models")
+                    return ""
+                    
+                response = self.client.chat(
+                    model=self.model,
+                    messages=messages,
+                    stream=False
+                )
+                return response['message']['content']
+            except ConnectionError as e:
+                print(f"Connection error with Ollama: {e}")
+                print("Please ensure Ollama is running and accessible")
+                return ""
+            except Exception as e:
+                print(f"Error in Ollama chat: {e}")
+                return ""
         except Exception as e:
-            print(f"Error in Ollama chat: {e}")
+            print(f"Unexpected error in Ollama chat: {e}")
             return ""
 
     def is_available(self) -> bool:
