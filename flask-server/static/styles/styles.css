@@ -116,15 +116,40 @@ main {
     color: #ff6347;
 }
 
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
 .search-box {
     width: 100%;
     padding: 0.75rem;
+    padding-right: 2.5rem;
     font-size: 1rem;
     margin-bottom: 1rem;
     border: 1px solid var(--border-color);
     border-radius: 5px;
     background-color: var(--input-bg);
     color: var(--input-text);
+}
+
+.clear-search {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+.clear-search:hover {
+    color: #ff6347;
 }
 
 .category-button {

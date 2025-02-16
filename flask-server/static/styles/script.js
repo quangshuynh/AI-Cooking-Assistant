@@ -99,6 +99,16 @@ function selectIngredient(ingredient) {
         categoryList.style.display = 'flex';
     }
     updateSelectedIngredientsDisplay();
+    
+    // Scroll to selected ingredients section
+    document.getElementById('selected-ingredients-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function clearSearch() {
+    const searchBox = document.getElementById('ingredient-search');
+    searchBox.value = '';
+    filterIngredients();
+    searchBox.focus();
 }
 
 function deselectIngredient(ingredient) {
