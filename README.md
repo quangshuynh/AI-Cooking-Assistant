@@ -52,19 +52,19 @@ An intelligent recipe generation application that creates personalized recipes b
    ```sh
    weaviate --host localhost --port 8080
    ```
+   
 4. Create a `.env` file in the project root:
-  ```env
-  # Model Selection (options: ollama, anthropic)
-  DEFAULT_MODEL_PROVIDER=ollama
-  
-  # Ollama Settings (if using Ollama)
-  OLLAMA_HOST=http://localhost:11434
-  OLLAMA_MODEL=dolphin-llama3
-  
-  # Anthropic Settings (if using Claude)
-  ANTHROPIC_API_KEY=your-api-key-here
-  ANTHROPIC_MODEL=claude-3-opus-20240229
-  ```
+   ```env
+   # Model Selection (options: ollama, anthropic)
+   DEFAULT_MODEL_PROVIDER=ollama
+
+   # Ollama Settings (if using Ollama)
+   OLLAMA_HOST=http://localhost:11434
+   OLLAMA_MODEL=dolphin-llama3
+
+   # Anthropic Settings (if using Claude)
+   ANTHROPIC_API_KEY=your-api-key-here
+   ANTHROPIC_MODEL=claude-3-opus-20240229
 
 5. Run the Flask server:
    ```sh
