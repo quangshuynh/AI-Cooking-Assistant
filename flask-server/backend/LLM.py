@@ -3,7 +3,7 @@ import re
 import os
 import time
 from typing import List, Dict, Optional
-from models.model_factory import ModelFactory
+from .models.model_factory import ModelFactory
 
 start_time = time.time()
 STEPS = 0
