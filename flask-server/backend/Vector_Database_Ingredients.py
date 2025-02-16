@@ -26,14 +26,24 @@ class IngredientsDB:
         """Ensure collection exists and is properly initialized."""
         try:
             try:
-                self.collection = self.client.collections.get(self.collection_name.lower())
-                count = self.collection.aggregate.over_all().total_count
-                if count > 0:
-                    print(f"Connected to existing collection with {count} ingredients")
-                    return
+                # Check if collection exists
+                collections = self.client.collections.list_all()
+                exists = any(c.name == self.collection_name.lower() for c in collections)
+                
+                if exists:
+                    self.collection = self.client.collections.get(self.collection_name.lower())
+                    # Use fetch_objects to check if collection has data
+                    objects = self.collection.query.fetch_objects(limit=1)
+                    if hasattr(objects, 'objects') and len(objects.objects) > 0:
+                        print(f"Connected to existing collection: {self.collection_name}")
+                        return
+                    else:
+                        print("Collection exists but is empty")
+                        self.client.collections.delete(self.collection_name.lower())
+                
             except weaviate.exceptions.UnexpectedStatusCodeError:
                 print("Creating new collection...")
-                
+            
             self._create_collection()
             self._initialize_data()
             
