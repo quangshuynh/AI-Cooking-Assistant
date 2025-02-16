@@ -18,7 +18,8 @@ class ModelFactory:
             BaseModel: Instance of the requested model
         """
         if provider is None:
-            provider = os.getenv('DEFAULT_MODEL_PROVIDER', 'ollama')
+            provider = os.getenv('DEFAULT_MODEL_PROVIDER', 'ollama').lower().strip()
+            print(f"Using model provider: {provider}")
 
         provider = provider.lower()
         if provider == 'ollama':

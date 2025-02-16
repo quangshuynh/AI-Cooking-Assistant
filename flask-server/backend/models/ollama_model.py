@@ -6,11 +6,18 @@ from .base_model import BaseModel
 class OllamaModel(BaseModel):
     def __init__(self):
         default_host = 'http://localhost:11434'
-        host = os.getenv('OLLAMA_HOST', default_host)
-        # Ensure URL has scheme
+        host = os.getenv('OLLAMA_HOST', default_host).strip()
+        
+        # Remove any trailing slashes and ensure proper scheme
+        host = host.rstrip('/')
         if not host.startswith(('http://', 'https://')):
             host = 'http://' + host
-        self.host = host.rstrip('/')
+            
+        # Replace 0.0.0.0 with localhost
+        host = host.replace('0.0.0.0', 'localhost')
+        
+        self.host = host
+        print(f"Initialized Ollama with host: {self.host}")
         self.model = os.getenv('OLLAMA_MODEL', 'dolphin-llama3')
 
     def chat(self, messages: List[Dict[str, str]], **kwargs) -> str:

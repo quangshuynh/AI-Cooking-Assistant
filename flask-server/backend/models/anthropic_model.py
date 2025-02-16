@@ -5,8 +5,12 @@ from .base_model import BaseModel
 
 class AnthropicModel(BaseModel):
     def __init__(self):
-        self.client = anthropic.Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
+        api_key = os.getenv('ANTHROPIC_API_KEY')
+        if not api_key:
+            raise ValueError("ANTHROPIC_API_KEY environment variable is not set")
+        self.client = anthropic.Anthropic(api_key=api_key)
         self.model = os.getenv('ANTHROPIC_MODEL', 'claude-3-opus-20240229')
+        print(f"Initialized Anthropic with model: {self.model}")
 
     def chat(self, messages: List[Dict[str, str]], **kwargs) -> str:
         try:
