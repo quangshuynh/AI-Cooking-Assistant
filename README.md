@@ -119,29 +119,52 @@ The application uses a modular model system. To add a new AI provider:
    - `is_available()`: Check configuration
 4. Add the model to `ModelFactory`
 
-## API Documentation
+## API Endpoints
+### 1. Generate Recipe
+- **Endpoint:** `/generate_recipe`
+- **Method:** POST
+- **Payload:**
+  ```json
+  {
+    "ingredients": ["chicken", "garlic", "tomato"],
+    "cuisine": "Italian",
+    "meal_type": "Dinner"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "recipe_html": "<div>Generated Recipe...</div>"
+  }
+  ```
 
-### Generate Recipe
-- **POST** `/generate_recipe`
-```json
-{
-  "ingredients": ["ingredient1", "ingredient2"],
-  "cuisine": "Italian",
-  "meal_type": "Dinner"
-}
-```
+### 2. Find Similar Recipes
+- **Endpoint:** `/find_recipes`
+- **Method:** POST
+- **Payload:**
+  ```json
+  {
+    "query": "chicken, garlic, tomato"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "recipes": [
+      {
+        "title": "Garlic Chicken Pasta",
+        "ingredients": "Chicken, Garlic, Tomato, Pasta, Olive Oil",
+        "instructions": "Cook chicken..."
+      }
+    ]
+  }
+  ```
 
-### Find Similar Recipes
-- **POST** `/find_recipes`
-```json
-{
-  "query": "ingredients, cuisine, meal type"
-}
-```
-
-### Suggest Ingredients
-- **GET** `/suggest_ingredients?query=ingredient`
-
-## License
-
-MIT License
+### 3. Ingredient Suggestions
+- **Endpoint:** `/suggest_ingredients`
+- **Method:** GET
+- **Query Parameter:** `query=<ingredient>`
+- **Response:**
+  ```json
+  ["Chicken", "Garlic", "Tomato"]
+  ```
