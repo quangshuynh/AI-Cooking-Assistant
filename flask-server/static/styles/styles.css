@@ -372,13 +372,41 @@ button.generate-btn:disabled {
 .suggestion-item {
     padding: 8px 12px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
+    background-color: var(--card-bg);
+    color: var(--text-color);
 }
 
 .suggestion-item:hover,
 .suggestion-item.highlighted {
-    background-color: #fff0ee;
+    background-color: var(--hover-bg);
     color: #ff6347;
+}
+
+.selected-ingredient-button {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin: 0.25rem;
+}
+
+.selected-ingredient-button:hover {
+    background-color: #ff6347;
+    color: white;
+}
+
+.selected-ingredients-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background-color: var(--card-bg);
+    border-radius: 5px;
 }
 
 /* Scrollbar styling for suggestions */

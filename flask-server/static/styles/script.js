@@ -182,48 +182,29 @@ function filterIngredients() {
 }
 
 function handleSuggestionClick(suggestion) {
-    // Show all categories temporarily to ensure we can find the ingredient
-    Object.keys(categories).forEach(categoryId => {
-        const category = document.getElementById(categoryId);
-        if (category) {
-            category.style.display = 'flex';
-            category.querySelectorAll('.ingredient-item').forEach(item => {
-                item.style.display = 'block';
-            });
+    // Show all categories temporarily
+    showAllCategories();
+
+    // Find and select the ingredient
+    const ingredient = findIngredientElement(suggestion);
+    if (ingredient && !ingredient.classList.contains('disabled')) {
+        selectIngredient(ingredient);
+        
+        // Make sure its category is visible
+        const categoryList = ingredient.parentElement;
+        if (categoryList) {
+            categoryList.style.display = 'flex';
         }
-    });
 
-    // Find the ingredient
-    let found = false;
-    document.querySelectorAll('.ingredient-item').forEach(item => {
-        if (item.textContent.toLowerCase() === suggestion.toLowerCase()) {
-            found = true;
-            if (!item.classList.contains('disabled')) {
-                // Select the ingredient
-                item.classList.add('selected');
+        // Scroll to the ingredient
+        ingredient.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 
-                // Make sure its category is visible
-                const categoryList = item.parentElement;
-                if (categoryList) {
-                    categoryList.style.display = 'flex';
-                }
-
-                // Scroll to the ingredient
-                item.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-                // Update the display
-                updateSelectedIngredientsDisplay();
-            }
-        }
-    });
-
-    // Hide suggestions
+    // Hide suggestions and reapply filters
     searchSuggestionsContainer.style.display = 'none';
-
-    // Reapply filters
     filterIngredients();
 
-    return found;
+    return !!ingredient;
 }
 
 async function handleIngredientSearch(event) {
@@ -297,12 +278,21 @@ document.querySelectorAll('.ingredient-item').forEach(item => {
 function updateSelectedIngredientsDisplay() {
     const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
         .map(item => item.textContent);
-    const selectedIngredientsDisplay = document.getElementById('selected-ingredients-display');
+    const container = document.getElementById('selected-ingredients-container');
 
     if (selectedIngredients.length > 0) {
-        selectedIngredientsDisplay.innerHTML = `<p>${selectedIngredients.join(', ')}</p>`;
+        container.innerHTML = selectedIngredients.map(ingredient => 
+            `<button class="selected-ingredient-button" onclick="removeIngredient('${ingredient}')">${ingredient}</button>`
+        ).join('');
     } else {
-        selectedIngredientsDisplay.innerHTML = `<p>No ingredients selected.</p>`;
+        container.innerHTML = '';
+    }
+}
+
+function removeIngredient(ingredientName) {
+    const ingredient = findIngredientElement(ingredientName);
+    if (ingredient) {
+        deselectIngredient(ingredient);
     }
 }
 
