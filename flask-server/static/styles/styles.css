@@ -66,17 +66,19 @@ header {
 
 h1 {
     position: relative;
+    display: inline-block; /* Makes h1 only as wide as its content */
     cursor: pointer;
+    margin: 0 auto; /* Centers the h1 */
 }
 
 h1::after {
     content: "Chef's Fantastic And Ready To Serve";
     position: absolute;
-    top: 110%; /* Position just below the h1 */
+    top: 100%; /* Position directly below the text */
     left: 50%;
     transform: translateX(-50%);
-    background-color: #333;
-    color: #fff;
+    background-color: var(--text-color); /* Use theme color */
+    color: var(--bg-color); /* Use theme color */
     padding: 0.3rem 0.6rem;
     border-radius: 3px;
     font-size: 0.9rem;
@@ -85,11 +87,12 @@ h1::after {
     transition: opacity 0.3s, transform 0.3s;
     pointer-events: none;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000; /* Ensure tooltip appears above other elements */
 }
 
 h1:hover::after {
     opacity: 1;
-    transform: translateX(-50%) translateY(-3px); /* Adds a slight bounce */
+    transform: translateX(-50%) translateY(5px);
 }
 
 main {
