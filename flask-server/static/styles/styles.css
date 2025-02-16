@@ -1,19 +1,67 @@
 /* Import Roboto font */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
+/* Dark mode variables */
+:root {
+    --bg-color: #e9e4e4;
+    --text-color: #333;
+    --header-bg: #ff6347;
+    --header-text: rgb(243, 239, 239);
+    --card-bg: #fff;
+    --border-color: #ddd;
+    --hover-bg: #fff0ee;
+    --button-bg: #ff6347;
+    --button-hover: #e5533e;
+}
+
+[data-theme="dark"] {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --header-bg: #ff3814;
+    --header-text: #ffffff;
+    --card-bg: #2d2d2d;
+    --border-color: #404040;
+    --hover-bg: #3d3d3d;
+    --button-bg: #ff3814;
+    --button-hover: #cc2e10;
+}
+
+/* Theme toggle button */
+.theme-toggle {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+}
+
+#theme-toggle-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+#theme-toggle-btn:hover {
+    transform: rotate(360deg);
+}
+
 /* Apply Roboto font */
 body {
-    font-family: 'Roboto', sans-serif; /* Changed from Arial to Roboto */
+    font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #e9e4e4;
+    background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
 header {
-    background-color: #ff6347;
-    color: rgb(243, 239, 239);
+    background-color: var(--header-bg);
+    color: var(--header-text);
     padding: 1rem;
     text-align: center;
+    position: relative;
 }
 
 h1 {

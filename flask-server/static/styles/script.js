@@ -1,3 +1,23 @@
+// Theme management
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    const btn = document.getElementById('theme-toggle-btn');
+    btn.textContent = theme === 'dark' ? '🌜' : '🌞';
+}
+
+function toggleTheme() {
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    setTheme(currentTheme === 'light' ? 'dark' : 'light');
+}
+
+// Initialize theme
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+    document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
+});
+
 // Global variables
 const categories = {
     "protein-list": false,
