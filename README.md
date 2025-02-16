@@ -42,19 +42,15 @@ An intelligent recipe generation application that creates personalized recipes b
    git clone https://github.com/quangshuynh/AI-Cooking-Assistant.git
    cd ai-cooking-assistant
    ```
-
 2. Install dependencies:
    ```sh
    pip install -r requirements.txt
    ```
-
 3. Start the Weaviate database (optional, if using local vector search):
    ```sh
    weaviate --host localhost --port 8080
    ```
-
 4. Create a `.env` file in the project root:
-
    ##### Ollama:
    ```env
    DEFAULT_MODEL_PROVIDER=ollama
@@ -63,7 +59,6 @@ An intelligent recipe generation application that creates personalized recipes b
    OLLAMA_HOST=http://localhost:11434
    OLLAMA_MODEL=dolphin-llama3
    ```
-
    ##### Anthropic Claude:
    ```env
    DEFAULT_MODEL_PROVIDER=anthropic
@@ -72,15 +67,14 @@ An intelligent recipe generation application that creates personalized recipes b
    ANTHROPIC_API_KEY=your-api-key-here
    ANTHROPIC_MODEL=claude-3-opus-20240229
    ```
-
 5. Run the Flask server:
    ```sh
    python flask-server/flask_app.py
    ```
-
 6. Open a browser and navigate to:
    ```
    http://127.0.0.1:5000/
+   ```
 
 ## Deployment
 ### Docker (Optional)
