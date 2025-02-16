@@ -17,13 +17,20 @@
 [data-theme="dark"] {
     --bg-color: #1a1a1a;
     --text-color: #e0e0e0;
-    --header-bg: #ff3814;
+    --header-bg: #cc2e10;
     --header-text: #ffffff;
     --card-bg: #2d2d2d;
     --border-color: #404040;
     --hover-bg: #3d3d3d;
-    --button-bg: #ff3814;
-    --button-hover: #cc2e10;
+    --button-bg: #cc2e10;
+    --button-hover: #a82409;
+    --input-bg: #2d2d2d;
+    --input-text: #e0e0e0;
+    --input-border: #404040;
+    --dropdown-bg: #2d2d2d;
+    --dropdown-text: #e0e0e0;
+    --recipe-bg: #2d2d2d;
+    --recipe-border: #404040;
 }
 
 /* Theme toggle button */
@@ -114,8 +121,10 @@ main {
     padding: 0.75rem;
     font-size: 1rem;
     margin-bottom: 1rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
+    background-color: var(--input-bg);
+    color: var(--input-text);
 }
 
 .category-button {
@@ -360,9 +369,9 @@ button.generate-btn:hover {
 .recipe-container {
     margin-bottom: 1rem;
     padding: 1rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
-    background-color: #fff;
+    background-color: var(--recipe-bg);
     cursor: pointer;
 }
 
@@ -405,6 +414,57 @@ button.generate-btn:hover {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Easter egg animations */
+.floating-emojis {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.floating-emoji {
+    position: absolute;
+    font-size: 24px;
+    animation: floatAround 15s linear infinite;
+    opacity: 0;
+}
+
+@keyframes floatAround {
+    0% {
+        transform: translate(-100%, random(100)%) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(200%, random(100)%) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Generate different paths for each emoji */
+.floating-emoji:nth-child(2n) {
+    animation-duration: 18s;
+    animation-direction: reverse;
+}
+
+.floating-emoji:nth-child(3n) {
+    animation-duration: 21s;
+    animation-timing-function: ease-in-out;
+}
+
+.floating-emoji:nth-child(4n) {
+    animation-duration: 24s;
+    animation-direction: alternate;
 }
 
 .loading-spinner {

@@ -11,11 +11,42 @@ function toggleTheme() {
     setTheme(currentTheme === 'light' ? 'dark' : 'light');
 }
 
-// Initialize theme
+// Easter egg and theme initialization
+let titleClickCount = 0;
+let easterEggActive = false;
+const foodEmojis = ['🍕', '🌮', '🍜', '🍣', '🍔', '🌭', '🍖', '🍗', '🥩', '🥓', '🍱', '🥘', '🥗', '🥪', '🌯', '🥙', '🥨', '🧀', '🥐', '🥖'];
+
+function activateEasterEgg() {
+    if (easterEggActive) return;
+    easterEggActive = true;
+    
+    const header = document.querySelector('header');
+    const container = document.createElement('div');
+    container.className = 'floating-emojis';
+    header.appendChild(container);
+
+    foodEmojis.forEach((emoji, index) => {
+        const floatingEmoji = document.createElement('span');
+        floatingEmoji.className = 'floating-emoji';
+        floatingEmoji.textContent = emoji;
+        floatingEmoji.style.animationDelay = `${index * 0.3}s`;
+        container.appendChild(floatingEmoji);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
     document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
+    
+    // Easter egg trigger
+    const title = document.querySelector('h1');
+    title.addEventListener('click', () => {
+        titleClickCount++;
+        if (titleClickCount >= 10) {
+            activateEasterEgg();
+        }
+    });
 });
 
 // Global variables
