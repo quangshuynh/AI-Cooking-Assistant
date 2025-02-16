@@ -13,8 +13,13 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 system_prompt_path = os.path.join(current_dir, 'system_prompt')
 system_prompt2_path = os.path.join(current_dir, 'system_prompt2')
 
-# Initialize the AI model
-model = ModelFactory.create_model()
+# Initialize the AI model and handle potential initialization errors
+try:
+    model = ModelFactory.create_model()
+    print("Successfully initialized AI model")
+except Exception as e:
+    print(f"Error initializing AI model: {e}")
+    raise
 
 # Function to extract recipe content from XML-like or formatted content
 def extract_recipe(xml_content, pattern):
