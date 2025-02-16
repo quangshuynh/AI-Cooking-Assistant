@@ -321,10 +321,12 @@ async function generateRecipe() {
     const cuisine = selectedCuisine === 'other' ? customCuisine : selectedCuisine;
     const mealType = document.getElementById('meal-type').value;
     const recipeMode = document.getElementById('recipe-mode').value;
-    
+    const modelProvider = document.getElementById('model-provider').value;
 
     const recipeDisplay = document.getElementById('recipe-display');
     const spinner = document.getElementById('loading-spinner');
+    const generateBtn = document.getElementById('generate-btn');
+    const cancelBtn = document.getElementById('cancel-btn');
 
     if (selectedIngredients.length === 0) {
         recipeDisplay.innerHTML = `<p>Please select at least one ingredient to ${recipeMode === 'find' ? 'find' : 'generate'} a recipe.</p>`;
@@ -340,10 +342,20 @@ async function generateRecipe() {
             ? { query: `${selectedIngredients.join(', ')}, ${cuisine}, ${mealType}` }
             : { ingredients: selectedIngredients, cuisine: cuisine, meal_type: mealType };
 
+        generateBtn.disabled = true;
+        cancelBtn.style.display = 'inline-block';
+
+        const controller = new AbortController();
+        currentRequest = controller;
+
         const response = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(requestData)
+            body: JSON.stringify({
+                ...requestData,
+                model_provider: modelProvider
+            }),
+            signal: controller.signal
         });
 
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -432,9 +444,30 @@ function toggleRecipeDetails(recipeId) {
     }
 }
 
+let currentRequest = null;
+
 function toggleCustomCuisineInput() {
     const customCuisineInput = document.getElementById('custom-cuisine');
     customCuisineInput.style.display = document.getElementById('cuisine').value === 'other' ? 'block' : 'none';
     customCuisineInput.style.opacity = document.getElementById('cuisine').value === 'other' ? '1' : '0';
 }
+
+function updateModelSelection() {
+    const recipeMode = document.getElementById('recipe-mode').value;
+    const modelSelection = document.getElementById('model-selection');
+    modelSelection.style.display = recipeMode === 'generate' ? 'block' : 'none';
+}
+
+function cancelGeneration() {
+    if (currentRequest) {
+        currentRequest.abort();
+        currentRequest = null;
+    }
+    document.getElementById('loading-spinner').style.display = 'none';
+    document.getElementById('generate-btn').disabled = false;
+    document.getElementById('cancel-btn').style.display = 'none';
+}
+
+// Add event listener for recipe mode change
+document.getElementById('recipe-mode').addEventListener('change', updateModelSelection);
 

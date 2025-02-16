@@ -230,6 +230,16 @@
                 <option value="Lunch">Lunch</option>
                 <option value="Dinner">Dinner</option>
             </select>
+
+            <!-- Model Selection (hidden by default) -->
+            <div id="model-selection" style="display: none;">
+                <label for="model-provider" data-icon="🤖">AI Model:</label>
+                <select id="model-provider" name="model-provider">
+                    <option value="default">Default (from settings)</option>
+                    <option value="anthropic">Anthropic Claude</option>
+                    <option value="ollama">Ollama</option>
+                </select>
+            </div>
         </div>
 
         <!-- Selected Ingredients Display -->
@@ -241,8 +251,11 @@
         </div>
 
         <!-- Additional Filters and Recipe Generator Section -->
-        <button class="generate-btn" onclick="generateRecipe()">Generate Recipe</button>
-        <button class="generate-btn" onclick="unselectAllIngredients()">Unselect All</button>
+        <div class="button-group">
+            <button class="generate-btn" onclick="generateRecipe()" id="generate-btn">Generate Recipe</button>
+            <button class="cancel-btn" onclick="cancelGeneration()" id="cancel-btn" style="display: none;">Cancel</button>
+            <button class="generate-btn" onclick="unselectAllIngredients()">Unselect All</button>
+        </div>
 
 
         <!-- Loading Spinner -->
