@@ -14,7 +14,7 @@ function toggleTheme() {
 // Easter egg and theme initialization
 let titleClickCount = 0;
 let easterEggActive = false;
-const foodEmojis = ['🍕', '🌮', '🍜', '🍣', '🍔', '🌭', '🍖', '🍗', '🥩', '🥓', '🍱', '🥘', '🥗', '🥪', '🌯', '🥙', '🥨', '🧀', '🥐', '🥖'];
+const foodEmojis = ['🍕', '🌮', '🍜', '🍣', '🍔', '🌭', '🍖', '🍗', '🥩', '🥓', '🍱', '🥘', '🥗', '🥪', '🌯', '🥙', '🥨', '🧀', '🥐', '🥖', '🍎', '🍇', '🍉', '🍌', '🥑', '🥦', '🥕', '🌽', '🍪', '🍩', '🍰', '🍫', '🍬', '🍭', '🍡', '🍧', '🍨', '🍦', '🥮', '🍮', '😋'];
 
 function activateEasterEgg() {
     if (easterEggActive) return;
@@ -23,6 +23,7 @@ function activateEasterEgg() {
     const header = document.querySelector('header');
     const container = document.createElement('div');
     container.className = 'floating-emojis';
+    container.id = 'floating-emojis-container';
     header.appendChild(container);
 
     foodEmojis.forEach((emoji, index) => {
@@ -30,8 +31,18 @@ function activateEasterEgg() {
         floatingEmoji.className = 'floating-emoji';
         floatingEmoji.textContent = emoji;
         floatingEmoji.style.animationDelay = `${index * 0.3}s`;
+        floatingEmoji.style.left = `${Math.random() * 100}%`;
+        floatingEmoji.style.top = `${Math.random() * 100}%`;
         container.appendChild(floatingEmoji);
     });
+}
+
+function deactivateEasterEgg() {
+    const container = document.getElementById('floating-emojis-container');
+    if (container) {
+        container.remove();
+    }
+    easterEggActive = false;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -40,11 +51,16 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
     
     // Easter egg trigger
-    const title = document.querySelector('h1');
-    title.addEventListener('click', () => {
+    const header = document.querySelector('header');
+    header.addEventListener('click', () => {
         titleClickCount++;
         if (titleClickCount >= 10) {
-            activateEasterEgg();
+            if (!easterEggActive) {
+                activateEasterEgg();
+            } else {
+                deactivateEasterEgg();
+                titleClickCount = 0;
+            }
         }
     });
 });

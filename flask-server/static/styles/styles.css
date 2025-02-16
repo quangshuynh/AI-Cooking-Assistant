@@ -150,19 +150,20 @@ main {
     flex-wrap: wrap;
     gap: 1rem;
     padding: 1rem;
-    background-color: #fff;
-    border: 1px solid #ddd;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: 5px;
     margin-bottom: 1rem;
 }
 
 .ingredient-item {
-    background-color: #fff;
+    background-color: var(--card-bg);
+    color: var(--text-color);
     padding: 0.5rem 1rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s;
 }
 
 .ingredient-item.selected {
@@ -192,18 +193,20 @@ button.generate-btn:hover {
 }
 
 .recipe-display {
-    background-color: #fff;
+    background-color: var(--card-bg);
+    color: var(--text-color);
     padding: 1rem;
     border-radius: 5px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
 }
 
 #additional-filters {
-    background-color: #fff;
+    background-color: var(--card-bg);
+    color: var(--text-color);
     border-radius: 8px;
     padding: 1rem;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 #additional-filters h2 {
@@ -271,7 +274,8 @@ button.generate-btn:hover {
 }
 
 #selected-ingredients-display {
-    background-color: #fff;
+    background-color: var(--card-bg);
+    color: var(--text-color);
     padding: 0.75rem;
     border-radius: 5px;
     box-shadow: none; 
@@ -436,17 +440,20 @@ button.generate-btn:hover {
 
 @keyframes floatAround {
     0% {
-        transform: translate(-100%, 50%) rotate(0deg);
+        transform: translate(0, 0) rotate(0deg);
         opacity: 0;
     }
     10% {
         opacity: 1;
     }
+    45% {
+        transform: translate(50%, -20%) rotate(180deg);
+    }
     90% {
         opacity: 1;
     }
     100% {
-        transform: translate(200%, 50%) rotate(360deg);
+        transform: translate(100%, 0) rotate(360deg);
         opacity: 0;
     }
 }
