@@ -88,7 +88,7 @@ To containerize the application, ensure you have Docker installed and follow the
    docker run -p 5000:5000 ai-cooking-assistant
    ```
 
-## AI Model Configuration\
+## AI Model Configuration
 ### Ollama
 - Default local model option
 - Requires Ollama to be installed and running
