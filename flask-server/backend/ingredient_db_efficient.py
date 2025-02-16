@@ -222,19 +222,22 @@ class IngredientDBEfficient(IngredientsDB):
 def get_similar_ingredients(ingredient, db=None):
     # Initialize the database only if not provided
     if db is None:
-        db = IngredientsDB()
+        db = IngredientDBEfficient()
 
-    similar_ingredients = db.search_similar_ingredients_by_name(ingredient, limit=5)
-    return [ingre['ingredient'] for ingre in similar_ingredients]
+    similar_ingredients = db.search_similar_ingredients(ingredient, limit=5)
+    return [ingre['ingredient'] for ingre in similar_ingredients['properties']] if similar_ingredients else []
 
 
 if __name__ == '__main__':
     # Initialize once
-    db = IngredientsDB()
+    db = IngredientDBEfficient()
 
     # Reuse the same connection for multiple queries
     while True:
         user_input = input('Ingredient (or "quit" to exit): ')
         if user_input.lower() == 'quit':
             break
-        print(get_similar_ingredients(user_input, db=db))
+        results = get_similar_ingredients(user_input, db=db)
+        print("\nSimilar ingredients:")
+        for i, ingredient in enumerate(results, 1):
+            print(f"{i}. {ingredient}")
