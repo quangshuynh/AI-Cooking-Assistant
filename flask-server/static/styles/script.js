@@ -241,7 +241,7 @@ function unselectAllIngredients() {
 async function generateRecipe() {
     const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
         .map(item => item.textContent);
-a
+
     const selectedCuisine = document.getElementById('cuisine').value;
     const customCuisine = document.getElementById('custom-cuisine').value;
     const cuisine = selectedCuisine === 'other' ? customCuisine : selectedCuisine;
@@ -316,7 +316,32 @@ a
             }
             recipeDisplay.innerHTML = recipesHtml;
         } else {
-            recipeDisplay.innerHTML = `<h3>Generated Recipe</h3>${result.recipe_html}`;
+            let recipesHtml = '<h3>Generated Recipes</h3>';
+            if (Array.isArray(result.recipes) && result.recipes.length > 0) {
+                result.recipes.forEach((recipe, index) => {
+                    recipesHtml += `
+                        <div class="recipe-container">
+                            <div class="recipe-header" onclick="toggleRecipeDetails('recipe-${index}')">
+                                ${recipe.name}
+                            </div>
+                            <div class="recipe-content" id="recipe-${index}" style="display: none;">
+                                <p><strong>Description:</strong> ${recipe.description}</p>
+                                <h4>Ingredients:</h4>
+                                <ul>
+                                    ${recipe.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+                                </ul>
+                                <h4>Instructions:</h4>
+                                <ol>
+                                    ${recipe.instructions.map(instruction => `<li>${instruction}</li>`).join('')}
+                                </ol>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                recipesHtml += '<p>No recipes generated</p>';
+            }
+            recipeDisplay.innerHTML = recipesHtml;
         }
     } catch (error) {
         spinner.style.display = 'none';
@@ -339,26 +364,3 @@ function toggleCustomCuisineInput() {
     customCuisineInput.style.opacity = document.getElementById('cuisine').value === 'other' ? '1' : '0';
 }
 
-// Progress tracking
-function updateProgressBar(progress) {
-    const progressBar = document.getElementById("progress-bar");
-    if (progressBar) {
-        progressBar.style.width = progress + "%";
-    }
-}
-
-async function fetchProgress() {
-    const eventSource = new EventSource("/progress");
-    eventSource.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        updateProgressBar(data.progress);
-        if (data.progress >= 100) {
-            eventSource.close();
-        }
-    };
-}
-
-function startRecipeGeneration() {
-    fetchProgress();
-    generateRecipe();
-}
