@@ -1,3 +1,11 @@
+import atexit
+import yaml
+import pandas as pd
+import weaviate
+from weaviate.classes import config as wvcc
+from weaviate.classes.query import MetadataQuery
+from weaviate.collections.classes.filters import Filter
+from typing import Dict, List, Any
 from Vector_Database_Ingredients import IngredientsDB, get_similar_ingredients
 
 class IngredientDBEfficient(IngredientsDB):

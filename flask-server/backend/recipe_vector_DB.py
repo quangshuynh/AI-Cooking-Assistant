@@ -18,8 +18,7 @@ class RecipeDB:
             self.backup_path = backup_path
             atexit.register(self.close)
 
-        try:
-            # First try to get existing collection
+            # Try to get existing collection
             try:
                 self.collection = self.client.collections.get(self.collection_name)
                 # Check if collection has data
