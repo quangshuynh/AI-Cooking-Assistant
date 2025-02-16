@@ -72,12 +72,12 @@ An intelligent recipe generation application that creates personalized recipes b
    ```
    
 
-6. Run the Flask server:
+5. Run the Flask server:
    ```sh
    python flask-server/flask_app.py
    ```
 
-7. Open a browser and navigate to:
+6. Open a browser and navigate to:
    ```
    http://127.0.0.1:5000/
    ```
