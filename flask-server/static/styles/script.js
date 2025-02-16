@@ -100,8 +100,7 @@ function selectIngredient(ingredient) {
     }
     updateSelectedIngredientsDisplay();
     
-    // Scroll to selected ingredients section
-    document.getElementById('selected-ingredients-section').scrollIntoView({ behavior: 'smooth' });
+    // Don't scroll when selecting ingredients
 }
 
 function clearSearch() {
@@ -195,15 +194,25 @@ function handleSuggestionClick(suggestion) {
     // Create a new ingredient button directly
     const container = document.getElementById('selected-ingredients-container');
     const existingIngredients = Array.from(document.querySelectorAll('.selected-ingredient-button'))
-        .map(btn => btn.textContent);
+        .map(btn => btn.textContent.toLowerCase());
     
-    // Only add if not already selected
-    if (!existingIngredients.includes(suggestion)) {
+    // Capitalize first letter of each word
+    const formattedSuggestion = suggestion.split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+    
+    // Only add if not already selected (case-insensitive check)
+    if (!existingIngredients.includes(suggestion.toLowerCase())) {
         const button = document.createElement('button');
         button.className = 'selected-ingredient-button';
-        button.textContent = suggestion;
-        button.onclick = () => removeIngredient(suggestion);
+        button.textContent = formattedSuggestion;
+        button.onclick = () => removeIngredient(formattedSuggestion);
         container.appendChild(button);
+        
+        // Also update the selected ingredients list
+        const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
+            .map(item => item.textContent);
+        selectedIngredients.push(formattedSuggestion);
     }
 
     // Hide suggestions and clear search
@@ -281,12 +290,20 @@ document.querySelectorAll('.ingredient-item').forEach(item => {
 });
 
 function updateSelectedIngredientsDisplay() {
-    const selectedIngredients = Array.from(document.querySelectorAll('.ingredient-item.selected'))
-        .map(item => item.textContent);
     const container = document.getElementById('selected-ingredients-container');
-
-    if (selectedIngredients.length > 0) {
-        container.innerHTML = selectedIngredients.map(ingredient => 
+    
+    // Get currently selected ingredients from both sources
+    const selectedFromList = Array.from(document.querySelectorAll('.ingredient-item.selected'))
+        .map(item => item.textContent);
+    const selectedFromSuggestions = Array.from(document.querySelectorAll('.selected-ingredient-button'))
+        .map(btn => btn.textContent);
+    
+    // Combine and deduplicate ingredients (case-insensitive)
+    const allIngredients = [...new Set([...selectedFromList, ...selectedFromSuggestions].map(ing => ing.toLowerCase()))]
+        .map(ing => ing.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '));
+    
+    if (allIngredients.length > 0) {
+        container.innerHTML = allIngredients.map(ingredient => 
             `<button class="selected-ingredient-button" onclick="removeIngredient('${ingredient}')">${ingredient}</button>`
         ).join('');
     } else {
