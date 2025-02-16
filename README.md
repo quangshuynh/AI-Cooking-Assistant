@@ -1,9 +1,8 @@
-# Chef's F.A.R.T.S. (Fantastic And Ready To Serve)
+# AI Cooking Assistant
 
 An intelligent recipe generation application that creates personalized recipes based on your available ingredients.
 
 ## Features
-
 - Ingredient-based recipe generation with category organization
 - Multiple AI model support (Ollama, Anthropic Claude)
 - Dark/Light theme support
@@ -24,19 +23,25 @@ An intelligent recipe generation application that creates personalized recipes b
   - Ollama (local)
   - Anthropic Claude (API)
 - **Database:** Weaviate (for recipe similarity searches)
+- **Deployment:** Docker
 
 ## Installation
 
 ### Prerequisites
+- Ollama (`dolphin-llama3`)
 - Python 3.8+
-- Git
+- Flask (`pip install flask`)
+- Weaviate (`pip install weaviate-client`)
+- Requests (`pip install requests`)
+- Jinja2 (`pip install jinja2`)
+- NumPy (`pip install numpy`)
 
 ### Setup Instructions
 1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/chefs-farts.git
-cd chefs-farts
-```
+   ```sh
+   git clone https://github.com/quangshuynh/AI-Cooking-Assistant.git
+   cd ai-cooking-assistant
+   ```
 
 2. Create and activate a virtual environment (optional but recommended):
 ```bash
@@ -63,18 +68,34 @@ ANTHROPIC_API_KEY=your-api-key-here
 ANTHROPIC_MODEL=claude-3-opus-20240229
 ```
 
-5. Run the application:
+5. Start the Weaviate database (optional, if using local vector search):
+   ```sh
+   weaviate --host localhost --port 8080
+   ```
+
+6. Run the application:
 ```bash
 python flask-server/flask_app.py
 ```
 
-6. Open your browser and navigate to:
+7. Open your browser and navigate to:
 ```
 http://127.0.0.1:5000
 ```
 
-## AI Model Configuration
+## Deployment
+### Docker (Optional)
+To containerize the application, ensure you have Docker installed and follow these steps:
+1. Build the Docker image:
+   ```sh
+   docker build -t ai-cooking-assistant .
+   ```
+2. Run the container:
+   ```sh
+   docker run -p 5000:5000 ai-cooking-assistant
+   ```
 
+## AI Model Configuration\
 ### Ollama
 - Default local model option
 - Requires Ollama to be installed and running
