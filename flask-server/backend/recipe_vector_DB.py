@@ -11,7 +11,8 @@ import time
 
 class RecipeDB:
     def __init__(self, collection_name="Recipe", schema_path="schema2.yaml", backup_path="backups"):
-        self.client = weaviate.connect_to_local(host='129.21.42.90')
+        try:
+            self.client = weaviate.connect_to_local()
         self.collection_name = collection_name
         self.schema_path = schema_path
         self.backup_path = backup_path

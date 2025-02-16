@@ -1,14 +1,4 @@
-import weaviate
-from weaviate.classes import config as wvcc
-from weaviate.classes.query import MetadataQuery
-from weaviate.collections.classes.filters import Filter
-import pandas as pd
-import yaml
-from typing import Dict, List, Any
-import atexit
-
-
-class IngredientsDB:
+from Vector_Database_Ingredients import IngredientsDB, get_similar_ingredients
     def __init__(self, collection_name="Ingredients", schema_path="schema.yaml"):
         self.client = weaviate.connect_to_local(host="129.21.42.90")
         self.collection_name = collection_name
