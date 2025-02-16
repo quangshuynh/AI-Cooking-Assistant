@@ -32,14 +32,17 @@ class IngredientsDB:
                 
                 if exists:
                     self.collection = self.client.collections.get(self.collection_name.lower())
-                    # Use fetch_objects to check if collection has data
-                    objects = self.collection.query.fetch_objects(limit=1)
-                    if hasattr(objects, 'objects') and len(objects.objects) > 0:
-                        print(f"Connected to existing collection: {self.collection_name}")
-                        return
-                    else:
-                        print("Collection exists but is empty")
-                        self.client.collections.delete(self.collection_name.lower())
+                    # Check if collection has data using get_objects
+                    try:
+                        count = self.collection.query.fetch_objects(limit=1)
+                        if hasattr(count, 'objects') and len(count.objects) > 0:
+                            print(f"Connected to existing collection: {self.collection_name}")
+                            return
+                    except Exception as e:
+                        print(f"Collection exists but may be empty: {e}")
+                    
+                    print("Recreating collection...")
+                    self.client.collections.delete(self.collection_name.lower())
                 
             except weaviate.exceptions.UnexpectedStatusCodeError:
                 print("Creating new collection...")

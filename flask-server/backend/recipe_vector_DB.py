@@ -22,13 +22,16 @@ class RecipeDB:
             try:
                 self.collection = self.client.collections.get(self.collection_name)
                 # Check if collection has data
-                count = self.collection.aggregate.over_all(total_count=True).total_count
-                if count > 0:
-                    print(f"Connected to existing collection with {count} recipes")
-                    return
-                else:
-                    print("Collection exists but is empty. Recreating...")
-                    self.client.collections.delete(self.collection_name)
+                try:
+                    count = self.collection.query.fetch_objects(limit=1)
+                    if hasattr(count, 'objects') and len(count.objects) > 0:
+                        print(f"Connected to existing collection: {self.collection_name}")
+                        return
+                except Exception as e:
+                    print(f"Collection exists but may be empty: {e}")
+                
+                print("Recreating collection...")
+                self.client.collections.delete(self.collection_name)
             except weaviate.exceptions.UnexpectedStatusCodeError:
                 print("No existing collection found. Creating new one...")
 
