@@ -28,7 +28,7 @@ class IngredientsDB:
             try:
                 # Check if collection exists
                 collections = self.client.collections.list_all()
-                exists = any(c.name == self.collection_name.lower() for c in collections)
+                exists = self.collection_name.lower() in collections
                 
                 if exists:
                     self.collection = self.client.collections.get(self.collection_name.lower())
