@@ -2,7 +2,12 @@ import ast
 import re
 import os
 import time
+import torch
 from .models.model_factory import ModelFactory
+
+# Check for GPU availability
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Using device: {DEVICE}")
 
 start_time = time.time()
 STEPS = 0
@@ -14,8 +19,11 @@ system_prompt2_path = os.path.join(current_dir, 'system_prompt2')
 
 # Initialize the AI model and handle potential initialization errors
 try:
-    model = ModelFactory.create_model()
-    print("Successfully initialized AI model")
+    model = ModelFactory.create_model(device=DEVICE)
+    if DEVICE == "cuda":
+        print(f"Successfully initialized AI model on GPU: {torch.cuda.get_device_name(0)}")
+    else:
+        print("Successfully initialized AI model on CPU")
 except Exception as e:
     print(f"Error initializing AI model: {e}")
     raise

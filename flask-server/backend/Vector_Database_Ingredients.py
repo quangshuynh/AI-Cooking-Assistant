@@ -26,8 +26,8 @@ class IngredientsDB:
         """Ensure collection exists and is properly initialized."""
         try:
             try:
-                self.collection = self.client.collections.get(self.collection_name)
-                count = self.collection.aggregate.over_all(total_count=True).total_count
+                self.collection = self.client.collections.get(self.collection_name.lower())
+                count = self.collection.aggregate.over_all().total_count
                 if count > 0:
                     print(f"Connected to existing collection with {count} ingredients")
                     return
