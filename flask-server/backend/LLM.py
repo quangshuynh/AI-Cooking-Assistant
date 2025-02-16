@@ -1,15 +1,11 @@
 import ast
 import re
-import sys
 import os
 import time
-import json
-import requests
+from typing import List, Dict, Optional
+from models.model_factory import ModelFactory
 
 start_time = time.time()
-
-url = '129.21.42.90'
-default_model = 'dolphin-llama3'
 STEPS = 0
 PROGRESS = 0
 
@@ -17,44 +13,8 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 system_prompt_path = os.path.join(current_dir, 'system_prompt')
 system_prompt2_path = os.path.join(current_dir, 'system_prompt2')
 
-
-def ollama_chat(model: str, messages: list, host: str = "http://192.168.1.100:11434") -> dict:
-    """
-    Replacement for ollama.chat that uses requests to connect to a remote Ollama instance
-
-    Args:
-        model (str): Name of the model to use
-        messages (list): List of message dictionaries with 'role' and 'content'
-        host (str): Host URL of the Ollama instance
-
-    Returns:
-        dict: Response dictionary with the same structure as ollama.chat
-    """
-    try:
-        response = requests.post(
-            f"{host}/api/chat",
-            json={
-                "model": model,
-                "messages": messages,
-                "stream": False  # This tells Ollama to return a single response
-            },
-            stream=False
-        )
-        response.raise_for_status()
-
-        # Parse the single JSON response
-        data = response.json()
-        return {
-            "message": {
-                "content": data["message"]["content"]
-            }
-        }
-    except requests.exceptions.RequestException as e:
-        print(f"Error connecting to Ollama: {e}")
-        return {"message": {"content": ""}}
-    except json.JSONDecodeError as e:
-        print(f"Error parsing Ollama response: {e}")
-        return {"message": {"content": ""}}
+# Initialize the AI model
+model = ModelFactory.create_model()
 
 # Function to extract recipe content from XML-like or formatted content
 def extract_recipe(xml_content, pattern):
@@ -132,19 +92,17 @@ def write_recipe(name: str, description: str, ingredients: list[str] = None, cos
         count += 1
         global STEPS
         STEPS += 1
-        response = ollama_chat(
-            model=default_model,
-            messages=[system_prompt, user_prompt],
-            host=f"http://{url}:11434"  # Replace with your target IP
-        )['message']['content']
-
+        
+        response = model.chat([system_prompt, user_prompt])
+        
         try:
             recipe_dict = parse_recipe_dict(response)
-            assert type(recipe_dict) == dict
-            assert type(recipe_dict['ingredients']) is list
-            assert type(recipe_dict['instructions']) is list
+            assert isinstance(recipe_dict, dict)
+            assert isinstance(recipe_dict['ingredients'], list)
+            assert isinstance(recipe_dict['instructions'], list)
             return recipe_dict
         except Exception as e:
+            print(f"Error parsing recipe: {e}")
             pass
 
     return False
@@ -175,21 +133,18 @@ def create_recipe_list(ingredients: list[str] = None, cost: int = 0, cuisine: st
         global STEPS
         STEPS += 1
 
-        response = ollama_chat(
-            model=default_model,
-            messages=[system_prompt, user_prompt],
-            host=f"http://{url}:11434"  # Replace with your target IP
-        )['message']['content']
+        response = model.chat([system_prompt, user_prompt])
 
         try:
             recipe_list_dict = parse_recipe_list(response)
-            assert type(recipe_list_dict) is list
-            assert type(recipe_list_dict[0]) is dict
-            assert type(recipe_list_dict[0]['recipe']) is str
-            assert type(recipe_list_dict[0]['description']) is str
+            assert isinstance(recipe_list_dict, list)
+            assert isinstance(recipe_list_dict[0], dict)
+            assert isinstance(recipe_list_dict[0]['recipe'], str)
+            assert isinstance(recipe_list_dict[0]['description'], str)
 
             return recipe_list_dict
         except Exception as e:
+            print(f"Error parsing recipe list: {e}")
             pass
 
     return []
