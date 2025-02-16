@@ -44,29 +44,29 @@ An intelligent recipe generation application that creates personalized recipes b
    ```
 
 2. Create and activate a virtual environment (optional but recommended):
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+  ```bash
+  python -m venv venv
+  source venv/bin/activate  # On Windows: venv\Scripts\activate
+  ```
 
 3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+  ```bash
+  pip install -r requirements.txt
+  ```
 
 4. Create a `.env` file in the project root:
-```env
-# Model Selection (options: ollama, anthropic)
-DEFAULT_MODEL_PROVIDER=ollama
-
-# Ollama Settings (if using Ollama)
-OLLAMA_HOST=http://localhost:11434
-OLLAMA_MODEL=dolphin-llama3
-
-# Anthropic Settings (if using Claude)
-ANTHROPIC_API_KEY=your-api-key-here
-ANTHROPIC_MODEL=claude-3-opus-20240229
-```
+  ```env
+  # Model Selection (options: ollama, anthropic)
+  DEFAULT_MODEL_PROVIDER=ollama
+  
+  # Ollama Settings (if using Ollama)
+  OLLAMA_HOST=http://localhost:11434
+  OLLAMA_MODEL=dolphin-llama3
+  
+  # Anthropic Settings (if using Claude)
+  ANTHROPIC_API_KEY=your-api-key-here
+  ANTHROPIC_MODEL=claude-3-opus-20240229
+  ```
 
 5. Start the Weaviate database (optional, if using local vector search):
    ```sh
@@ -74,14 +74,14 @@ ANTHROPIC_MODEL=claude-3-opus-20240229
    ```
 
 6. Run the application:
-```bash
-python flask-server/flask_app.py
-```
+  ```bash
+  python flask-server/flask_app.py
+  ```
 
 7. Open your browser and navigate to:
-```
-http://127.0.0.1:5000
-```
+  ```
+  http://127.0.0.1:5000
+  ```
 
 ## Deployment
 ### Docker (Optional)
