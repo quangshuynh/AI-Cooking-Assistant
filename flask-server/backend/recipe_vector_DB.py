@@ -78,9 +78,16 @@ class RecipeDB:
             batch_size = 100
             batches = (total + batch_size - 1) // batch_size
 
-            print(f"\nImporting {total} recipes in {batches} batches:")
+            # Check existing progress
+            try:
+                existing_count = self.collection.query.fetch_objects(limit=1, offset=0).total_results
+                start_batch = existing_count // batch_size
+                print(f"\nResuming from batch {start_batch} ({existing_count} recipes already imported)")
+            except:
+                start_batch = 0
+                print(f"\nStarting new import of {total} recipes in {batches} batches:")
 
-            for batch_num in range(batches):
+            for batch_num in range(start_batch, batches):
                 start_idx = batch_num * batch_size
                 end_idx = min(start_idx + batch_size, total)
 
