@@ -138,7 +138,7 @@ main {
     position: absolute;
     right: 0.5rem;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(-70%);
     background: none;
     border: none;
     color: var(--text-color);
@@ -151,7 +151,6 @@ main {
     justify-content: center;
     border-radius: 50%;
     transition: background-color 0.2s;
-    margin-bottom: 1rem;
 }
 
 .clear-search:hover {

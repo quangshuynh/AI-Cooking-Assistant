@@ -315,6 +315,14 @@ function updateSelectedIngredientsDisplay() {
 }
 
 function removeIngredient(ingredientName) {
+    // Remove from selected ingredients display
+    const button = Array.from(document.getElementsByClassName('selected-ingredient-button'))
+        .find(btn => btn.textContent === ingredientName);
+    if (button) {
+        button.remove();
+    }
+
+    // Deselect from ingredient list if it exists there
     const ingredient = findIngredientElement(ingredientName);
     if (ingredient) {
         deselectIngredient(ingredient);
@@ -329,7 +337,8 @@ function unselectAllIngredients() {
 
 async function generateRecipe() {
     const container = document.getElementById('selected-ingredients-container');
-    const selectedIngredients = JSON.parse(container.getAttribute('data-selected-ingredients') || '[]');
+    const selectedButtons = container.getElementsByClassName('selected-ingredient-button');
+    const selectedIngredients = Array.from(selectedButtons).map(btn => btn.textContent);
 
     const selectedCuisine = document.getElementById('cuisine').value;
     const customCuisine = document.getElementById('custom-cuisine').value;
