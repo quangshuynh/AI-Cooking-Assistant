@@ -1,4 +1,4 @@
-class: Ingredients
+class: ingredients
 vectorizer: text2vec-transformers
 properties:
   - name: ingredient

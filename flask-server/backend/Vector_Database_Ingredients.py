@@ -25,27 +25,17 @@ class IngredientsDB:
     def _ensure_collection(self) -> None:
         """Ensure collection exists and is properly initialized."""
         try:
+            # First try to delete any existing collection
             try:
-                # Check if collection exists
                 collections = self.client.collections.list_all()
-                exists = self.collection_name.lower() in collections
-                
-                if exists:
-                    self.collection = self.client.collections.get(self.collection_name.lower())
-                    # Check if collection has data using get_objects
-                    try:
-                        count = self.collection.query.fetch_objects(limit=1)
-                        if hasattr(count, 'objects') and len(count.objects) > 0:
-                            print(f"Connected to existing collection: {self.collection_name}")
-                            return
-                    except Exception as e:
-                        print(f"Collection exists but may be empty: {e}")
-                    
-                    print("Recreating collection...")
-                    self.client.collections.delete(self.collection_name.lower())
-                
-            except weaviate.exceptions.UnexpectedStatusCodeError:
-                print("Creating new collection...")
+                collection_name = self.collection_name.lower()
+                if collection_name in collections:
+                    print(f"Deleting existing collection: {collection_name}")
+                    self.client.collections.delete(collection_name)
+            except Exception as e:
+                print(f"Warning during collection cleanup: {e}")
+
+            print("Creating new collection...")
             
             self._create_collection()
             self._initialize_data()
@@ -66,7 +56,7 @@ class IngredientsDB:
             ]
 
             self.collection = self.client.collections.create(
-                name=self.collection_name,
+                name=self.collection_name.lower(),
                 vectorizer_config=wvcc.Configure.Vectorizer.text2vec_transformers(),
                 properties=properties
             )
